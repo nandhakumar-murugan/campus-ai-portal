@@ -6,6 +6,16 @@ This platform pools RAM/VRAM across student laptops and campus lab PCs over high
 
 ---
 
+## 👤 Author & Project Creator
+
+* **Creator & Lead Developer**: **Nandhakumar Murugan**
+* **GitHub Profile**: [github.com/nandhakumar-murugan](https://github.com/nandhakumar-murugan)
+* **Repository**: [nandhakumar-murugan/campus-ai-portal](https://github.com/nandhakumar-murugan/campus-ai-portal)
+* **Institution**: KGiSL Educational Institutions (`kgisledu.com`), Coimbatore, Tamil Nadu, India
+* **Campus Network**: `NMH-HOSTEL` Wi-Fi 6 (`172.16.0.0/12`)
+
+---
+
 ## 🌟 Key Features
 
 1. **💬 Interactive AI Chat & Code Generator**:
@@ -22,6 +32,15 @@ This platform pools RAM/VRAM across student laptops and campus lab PCs over high
 
 ---
 
+## 💻 Hardware & Network Infrastructure
+
+* **Host Coordinator Node**: `NANDHAKUMAR` (`172.16.110.229` / `192.168.137.1`)
+* **Host Processor**: 12th Gen Intel(R) Core(TM) i5-1235U (12 Cores)
+* **System Memory**: 16 GB RAM
+* **Network Speed**: 573.5 Mbps (Wi-Fi 6 802.11ax, 5 GHz)
+
+---
+
 ## 🚀 Quick Start Guide
 
 ### Prerequisites
@@ -30,7 +49,7 @@ This platform pools RAM/VRAM across student laptops and campus lab PCs over high
 
 ### 1. Install & Run Server
 ```bash
-git clone https://github.com/your-username/campus-ai-portal.git
+git clone https://github.com/nandhakumar-murugan/campus-ai-portal.git
 cd campus-ai-portal
 npm install
 npm start
@@ -71,4 +90,4 @@ http://172.16.110.229:3000
 - **Fault-Tolerant**: Dynamic auto-failover if student laptops join or disconnect.
 
 ---
-*Created for KGiSL Educational Institutions (`kgisledu.com`) Hostel & Campus Community.*
+*Created by **Nandhakumar Murugan** for KGiSL Educational Institutions (`kgisledu.com`) Hostel & Campus Community.*
