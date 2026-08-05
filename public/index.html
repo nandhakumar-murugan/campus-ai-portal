@@ -21,7 +21,7 @@
       <div class="logo-icon">⚡</div>
       <div class="brand-text">
         <h1>Campus AI <span class="badge-tag">Supercomputer</span></h1>
-        <p class="brand-sub">Distributed Hostel & Campus Intranet Cluster • <code>172.16.0.0/12</code></p>
+        <p class="brand-sub">Created by <strong>Nandhakumar Murugan</strong> • <code>kgisledu.com</code> Network</p>
       </div>
     </div>
 
@@ -43,7 +43,7 @@
       <div class="status-pill nodes-pill">
         <span class="pill-icon">💻</span>
         <span class="pill-label">Active Nodes:</span>
-        <strong id="active-nodes-count">5 Laptops</strong>
+        <strong id="active-nodes-count">Scanning...</strong>
       </div>
     </div>
   </header>
@@ -54,7 +54,7 @@
       <span class="tab-icon">💬</span> AI Studio & Code Generator
     </button>
     <button class="nav-tab" data-tab="cluster-monitor">
-      <span class="tab-icon">⚡</span> Cluster Network Monitor
+      <span class="tab-icon">⚡</span> Real-Time Cluster Monitor
     </button>
     <button class="nav-tab" data-tab="join-node">
       <span class="tab-icon">🤝</span> Join Compute Pool
@@ -85,20 +85,20 @@
 
           <div class="control-card">
             <h3>⚙️ System Prompt</h3>
-            <textarea id="system-prompt" class="custom-textarea" rows="3">You are Campus AI, an expert software developer and research assistant hosted locally on the KGiSL hostel Wi-Fi network.</textarea>
+            <textarea id="system-prompt" class="custom-textarea" rows="3">You are Campus AI, an expert software developer hosted on the KGiSL intranet network by Nandhakumar Murugan.</textarea>
           </div>
 
           <div class="control-card metrics-mini">
             <div class="metric-row">
-              <span>Hostel Latency:</span>
-              <strong id="live-latency">~3 ms</strong>
+              <span>Real Host CPU Load:</span>
+              <strong id="live-cpu">Scanning...</strong>
             </div>
             <div class="metric-row">
-              <span>Pooled VRAM:</span>
-              <strong id="sidebar-vram">48 GB</strong>
+              <span>Real System RAM:</span>
+              <strong id="sidebar-vram">Scanning...</strong>
             </div>
             <div class="metric-row">
-              <span>Privacy Guarantee:</span>
+              <span>Campus Network Privacy:</span>
               <span class="badge-success">100% On-Premise</span>
             </div>
           </div>
@@ -109,7 +109,7 @@
           <div class="chat-header">
             <div class="chat-title">
               <span class="chat-status-dot"></span>
-              <strong>Active Session:</strong> Campus Intranet Dedicated AI
+              <strong>Active Session:</strong> Campus Intranet AI Engine
             </div>
             <button class="btn-clear" id="clear-chat-btn">Clear History</button>
           </div>
@@ -119,8 +119,8 @@
             <div class="message assistant-msg">
               <div class="msg-avatar">⚡</div>
               <div class="msg-content">
-                <h3>Welcome to the Campus AI Supercomputer! 🚀</h3>
-                <p>You are connected directly to the local hostel Wi-Fi AI cluster. Ask any programming questions, generate code snippets, or debug algorithms.</p>
+                <h3>Welcome to Campus AI Supercomputer! 🚀</h3>
+                <p>Connected directly to your campus Wi-Fi network. Ask programming questions, generate code snippets, or debug algorithms with real-time execution.</p>
                 <div class="quick-prompts">
                   <button class="chip-prompt" data-prompt="Write a Python script for quicksort algorithm with comments">🐍 Python Quicksort</button>
                   <button class="chip-prompt" data-prompt="How do I configure VS Code Continue extension to use this campus IP?">💻 VS Code Setup</button>
@@ -150,39 +150,39 @@
         <div class="metric-card">
           <div class="metric-icon">💻</div>
           <div class="metric-data">
-            <h2 id="total-nodes-val">5 Nodes</h2>
-            <p>Active Student Devices</p>
+            <h2 id="total-nodes-val">Scanning...</h2>
+            <p>Real Active Subnet Devices</p>
           </div>
         </div>
 
         <div class="metric-card">
           <div class="metric-icon">🧠</div>
           <div class="metric-data">
-            <h2 id="total-vram-val">48 GB</h2>
-            <p>Pooled Cluster VRAM</p>
+            <h2 id="total-vram-val">Scanning...</h2>
+            <p>Real Available RAM Memory</p>
           </div>
         </div>
 
         <div class="metric-card">
           <div class="metric-icon">⚡</div>
           <div class="metric-data">
-            <h2 id="total-ram-val">96 GB</h2>
-            <p>Pooled System RAM</p>
+            <h2 id="total-ram-val">Scanning...</h2>
+            <p>Real Total Installed System RAM</p>
           </div>
         </div>
 
         <div class="metric-card">
-          <div class="metric-icon">📶</div>
+          <div class="metric-icon">🎛️</div>
           <div class="metric-data">
-            <h2>573.5 Mbps</h2>
-            <p>Wi-Fi 6 Link Speed</p>
+            <h2 id="cpu-usage-val">Scanning...</h2>
+            <p>Real Host CPU Utilization</p>
           </div>
         </div>
 
         <!-- Interactive Topology Canvas -->
         <div class="topology-card grid-col-span-2">
           <div class="card-header">
-            <h3>🌐 Live Network Topology (Hostel & Campus Nodes)</h3>
+            <h3>🌐 Real-Time Subnet Topology Map (ARP Discovered Devices)</h3>
             <span class="live-pulse">LIVE WEBSOCKET FEED</span>
           </div>
           <div class="canvas-container">
@@ -192,16 +192,16 @@
 
         <!-- Connected Nodes Table -->
         <div class="nodes-table-card grid-col-span-2">
-          <h3>📋 Active Worker Nodes Registry</h3>
+          <h3>📋 Live Discovered ARP Network Devices Table</h3>
           <table class="data-table">
             <thead>
               <tr>
-                <th>Node Name</th>
-                <th>Device Type</th>
+                <th>Device Name</th>
+                <th>Hardware / Network Card</th>
                 <th>Campus IP</th>
-                <th>VRAM / RAM</th>
-                <th>Role</th>
-                <th>Latency</th>
+                <th>System Memory</th>
+                <th>Network Role</th>
+                <th>Ping Latency</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -219,13 +219,13 @@
       <div class="form-container-card">
         <div class="form-header">
           <h2>🤝 Contribute Your Laptop to the Hostel Supercomputer</h2>
-          <p>By connecting your laptop into the pool, you contribute idle RAM/VRAM to help run larger AI models (like Llama 70B) for the entire hostel community.</p>
+          <p>By connecting your laptop into the pool, you contribute idle RAM/VRAM to help run larger AI models for the entire hostel community.</p>
         </div>
 
         <form id="join-node-form" class="join-form">
           <div class="form-group">
             <label for="node-name">Device Name / Student Identifier</label>
-            <input type="text" id="node-name" placeholder="e.g., Alex's RTX Laptop / Hostel B-204" required>
+            <input type="text" id="node-name" placeholder="e.g., Alex's Laptop / Hostel B-204" required>
           </div>
 
           <div class="form-row">
@@ -233,7 +233,7 @@
               <label for="device-type">Device Hardware Type</label>
               <select id="device-type" class="custom-select">
                 <option value="Dedicated Gaming Laptop (NVIDIA RTX)">NVIDIA RTX Gaming Laptop</option>
-                <option value="Apple Silicon (M1/M2/M3)">Apple Silicon Mac (Unified RAM)</option>
+                <option value="Apple Silicon (M1/M2/M3/M4)">Apple Silicon Mac (Unified RAM)</option>
                 <option value="Desktop Workstation">Desktop Workstation PC</option>
                 <option value="Standard Student Laptop">Standard Intel/AMD Laptop</option>
               </select>
@@ -277,7 +277,7 @@
       <div class="setup-container">
         <div class="setup-header">
           <h2>💻 Free GitHub Copilot Alternative inside VS Code</h2>
-          <p>Connect VS Code, Cursor, or python projects directly to your campus AI server using your hostel IP <code>172.16.110.229</code>.</p>
+          <p>Connect VS Code, Cursor, or python projects directly to your campus AI server using your host IP.</p>
         </div>
 
         <div class="setup-steps-grid">
@@ -289,16 +289,7 @@
             <p>1. Install <strong>Continue</strong> from VS Code Extensions.<br>
                2. Open <code>~/.continue/config.json</code> and paste:</p>
             <div class="code-block-wrapper">
-              <pre><code id="code-continue">{
-  "models": [
-    {
-      "title": "Campus AI (DeepSeek / Llama)",
-      "provider": "ollama",
-      "model": "deepseek-coder",
-      "apiBase": "http://172.16.110.229:3000"
-    }
-  ]
-}</code></pre>
+              <pre><code id="code-continue">Loading real IP config...</code></pre>
               <button class="btn-copy" data-target="code-continue">Copy Config</button>
             </div>
           </div>
@@ -309,19 +300,7 @@
             <h3>Python OpenAI SDK</h3>
             <p>Use standard OpenAI library pointing to your campus server:</p>
             <div class="code-block-wrapper">
-              <pre><code id="code-python">from openai import OpenAI
-
-client = OpenAI(
-    base_url="http://172.16.110.229:3000/v1",
-    api_key="campus-ai"
-)
-
-response = client.chat.completions.create(
-    model="deepseek-coder",
-    messages=[{"role": "user", "content": "Write a Python script"}]
-)
-
-print(response.choices[0].message.content)</code></pre>
+              <pre><code id="code-python">Loading real Python code...</code></pre>
               <button class="btn-copy" data-target="code-python">Copy Python Code</button>
             </div>
           </div>
@@ -332,12 +311,7 @@ print(response.choices[0].message.content)</code></pre>
             <h3>cURL Terminal Command</h3>
             <p>Query directly from PowerShell or Terminal:</p>
             <div class="code-block-wrapper">
-              <pre><code id="code-curl">curl http://172.16.110.229:3000/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "deepseek-coder",
-    "messages": [{"role": "user", "content": "Explain Quicksort"}]
-  }'</code></pre>
+              <pre><code id="code-curl">Loading real cURL command...</code></pre>
               <button class="btn-copy" data-target="code-curl">Copy cURL</button>
             </div>
           </div>
