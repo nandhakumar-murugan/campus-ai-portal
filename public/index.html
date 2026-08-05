@@ -76,16 +76,23 @@
           <div class="control-card">
             <h3>🧠 Select AI Model</h3>
             <select id="model-select" class="custom-select">
-              <option value="deepseek-r1">DeepSeek-R1 (32B Distill) — Deep Reasoning</option>
-              <option value="deepseek-coder">DeepSeek Coder V2 (16B) — Code & Copilot</option>
-              <option value="llama-3.2-3b">Llama 3.2 (3B) — Ultra-Fast Chat</option>
-              <option value="qwen-2.5-coder">Qwen 2.5 Coder (7B) — Python/C++/Java</option>
+              <optgroup label="🔷 Google DeepMind (Offline Models)">
+                <option value="gemma-2-2b" selected>Google Gemma 2 (2B Offline) — Ultra Fast</option>
+                <option value="gemma-2-9b">Google Gemma 2 (9B Offline) — High Accuracy Code</option>
+                <option value="gemini-nano">Google Gemini Nano (Offline Edge) — On-Device</option>
+              </optgroup>
+              <optgroup label="⚡ Campus Supercomputer Models">
+                <option value="deepseek-r1">DeepSeek-R1 (32B Distill) — Deep Reasoning</option>
+                <option value="deepseek-coder">DeepSeek Coder V2 (16B) — Code & Copilot</option>
+                <option value="llama-3.2-3b">Llama 3.2 (3B) — Ultra-Fast Chat</option>
+                <option value="qwen-2.5-coder">Qwen 2.5 Coder (7B) — Python/C++/Java</option>
+              </optgroup>
             </select>
           </div>
 
           <div class="control-card">
             <h3>⚙️ System Prompt</h3>
-            <textarea id="system-prompt" class="custom-textarea" rows="3">You are Campus AI, an expert software developer hosted on the KGiSL intranet network by Nandhakumar Murugan.</textarea>
+            <textarea id="system-prompt" class="custom-textarea" rows="3">You are Google Gemma / Campus AI, an expert software developer running offline on the KGiSL intranet network by Nandhakumar Murugan.</textarea>
           </div>
 
           <div class="control-card metrics-mini">
@@ -98,8 +105,8 @@
               <strong id="sidebar-vram">Scanning...</strong>
             </div>
             <div class="metric-row">
-              <span>Campus Network Privacy:</span>
-              <span class="badge-success">100% On-Premise</span>
+              <span>Google Model Privacy:</span>
+              <span class="badge-success">100% Offline On-Premise</span>
             </div>
           </div>
         </aside>
@@ -109,7 +116,7 @@
           <div class="chat-header">
             <div class="chat-title">
               <span class="chat-status-dot"></span>
-              <strong>Active Session:</strong> Campus Intranet AI Engine
+              <strong>Active Session:</strong> Google Gemma 2 / Campus AI Engine
             </div>
             <button class="btn-clear" id="clear-chat-btn">Clear History</button>
           </div>
@@ -117,13 +124,13 @@
           <div id="chat-messages" class="chat-messages">
             <!-- Welcome Assistant Message -->
             <div class="message assistant-msg">
-              <div class="msg-avatar">⚡</div>
+              <div class="msg-avatar">🔷</div>
               <div class="msg-content">
-                <h3>Welcome to Campus AI Supercomputer! 🚀</h3>
-                <p>Connected directly to your campus Wi-Fi network. Ask programming questions, generate code snippets, or debug algorithms with real-time execution.</p>
+                <h3>Welcome to Google Offline AI & Campus Supercomputer! 🚀</h3>
+                <p>Featuring <strong>Google Gemma 2 (2B & 9B)</strong> and <strong>Google Gemini Nano</strong> running 100% offline on your campus Wi-Fi network. Ask programming questions or generate code snippets instantly.</p>
                 <div class="quick-prompts">
-                  <button class="chip-prompt" data-prompt="Write a Python script for quicksort algorithm with comments">🐍 Python Quicksort</button>
-                  <button class="chip-prompt" data-prompt="How do I configure VS Code Continue extension to use this campus IP?">💻 VS Code Setup</button>
+                  <button class="chip-prompt" data-prompt="Write a Python script for quicksort algorithm using Google Gemma">🔷 Google Gemma Quicksort</button>
+                  <button class="chip-prompt" data-prompt="How do I configure VS Code Continue extension for Google Gemma offline?">💻 VS Code Setup</button>
                   <button class="chip-prompt" data-prompt="Create a React component for a live status gauge">⚛️ React Component</button>
                 </div>
               </div>
@@ -132,7 +139,7 @@
 
           <!-- Chat Input Form -->
           <form id="chat-form" class="chat-input-form">
-            <input type="text" id="chat-input" placeholder="Ask Campus AI to write code, solve algorithms, or explain concepts..." required autocomplete="off">
+            <input type="text" id="chat-input" placeholder="Ask Google Gemma or Campus AI to write code, solve algorithms, or explain concepts..." required autocomplete="off">
             <button type="submit" id="send-btn" class="btn-primary">
               <span>Send Prompt</span> ⚡
             </button>
@@ -148,7 +155,7 @@
 
         <!-- Metrics Overview Cards -->
         <div class="metric-card">
-          <div class="metric-icon">💻</div>
+          <div class="metric-icon">🔷</div>
           <div class="metric-data">
             <h2 id="total-nodes-val">Scanning...</h2>
             <p>Real Active Subnet Devices</p>
@@ -182,7 +189,7 @@
         <!-- Interactive Topology Canvas -->
         <div class="topology-card grid-col-span-2">
           <div class="card-header">
-            <h3>🌐 Real-Time Subnet Topology Map (ARP Discovered Devices)</h3>
+            <h3>🌐 Real-Time Subnet Topology Map (Google Offline & Campus Nodes)</h3>
             <span class="live-pulse">LIVE WEBSOCKET FEED</span>
           </div>
           <div class="canvas-container">
@@ -219,7 +226,7 @@
       <div class="form-container-card">
         <div class="form-header">
           <h2>🤝 Contribute Your Laptop to the Hostel Supercomputer</h2>
-          <p>By connecting your laptop into the pool, you contribute idle RAM/VRAM to help run larger AI models for the entire hostel community.</p>
+          <p>By connecting your laptop into the pool, you contribute idle RAM/VRAM to help run Google Gemma 2 and DeepSeek models for the entire hostel community.</p>
         </div>
 
         <form id="join-node-form" class="join-form">
@@ -276,8 +283,8 @@
     <section id="vscode-setup" class="tab-pane">
       <div class="setup-container">
         <div class="setup-header">
-          <h2>💻 Free GitHub Copilot Alternative inside VS Code</h2>
-          <p>Connect VS Code, Cursor, or python projects directly to your campus AI server using your host IP.</p>
+          <h2>💻 Free GitHub Copilot Alternative (Google Gemma Offline) inside VS Code</h2>
+          <p>Connect VS Code, Cursor, or python projects directly to your campus server running Google Gemma models offline.</p>
         </div>
 
         <div class="setup-steps-grid">
