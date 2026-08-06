@@ -20,7 +20,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Load persisted contributor student registrations
 let registeredNodes = [];
 if (fs.existsSync(CONTRIBUTORS_FILE)) {
   try {
@@ -40,7 +39,7 @@ let totalRequestsProcessed = 0;
 let lastCpuMeasure = getCpuTimes();
 
 let realWifiDetails = {
-  ssid: 'NMH-HOSTEL',
+  ssid: 'Campus Wi-Fi',
   speedMbps: '573.5',
   rxMbps: '573.5',
   txMbps: '573.5',
@@ -195,14 +194,12 @@ function scanRealArpDevices() {
       latencyMs: 1
     });
 
-    // 1. FIRST INJECT ALL MANUALLY REGISTERED CONTRIBUTOR STUDENTS (like Siva)
     registeredNodes.forEach(rn => {
       if (!nodes.some(n => n.ip === rn.ip || n.name === rn.name)) {
         nodes.push(rn);
       }
     });
 
-    // 2. DISCOVER SUBNET ARP DEVICES
     if (stdout) {
       const lines = stdout.split('\n');
       for (const line of lines) {
@@ -216,7 +213,7 @@ function scanRealArpDevices() {
             
             nodes.push({
               id: `arp-${ip.replace(/\./g, '-')}`,
-              name: isGateway ? 'Campus Gateway (Sophos Firewall)' : `Network Node (${ip})`,
+              name: isGateway ? 'Campus Gateway (Sophos Firewall)' : `Campus Student Laptop (${ip})`,
               ip: ip,
               type: isGateway ? 'Sophos Firewall Router' : `Network Card (${mac.substring(0, 8)}...)`,
               ramGB: 16,

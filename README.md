@@ -1,93 +1,52 @@
 # ⚡ Campus AI Supercomputer & Developer Portal
 
-An open-source, high-performance **Campus AI Web Portal & Distributed Cluster Coordinator** built for student devices on the college intranet (`kgisledu.com` / `NMH-HOSTEL` Wi-Fi).
+An open-source, high-performance **Campus AI Web Portal & Offline LLM Inference Engine** built for students and faculty at **KGiSL Educational Institutions** (`kgisledu.com`).
 
-This platform pools RAM/VRAM across student laptops and campus lab PCs over high-speed Wi-Fi 6, enabling any student on campus to generate code, chat with top AI models (DeepSeek R1, Llama 3.2, Qwen 2.5 Coder), and integrate AI directly into **VS Code** (`Continue.dev`, `Cline`) for free.
-
----
-
-## 👤 Author & Project Creator
-
-* **Creator & Lead Developer**: **Nandhakumar Murugan**
-* **GitHub Profile**: [github.com/nandhakumar-murugan](https://github.com/nandhakumar-murugan)
-* **Repository**: [nandhakumar-murugan/campus-ai-portal](https://github.com/nandhakumar-murugan/campus-ai-portal)
-* **Institution**: KGiSL Educational Institutions (`kgisledu.com`), Coimbatore, Tamil Nadu, India
-* **Campus Network**: `NMH-HOSTEL` Wi-Fi 6 (`172.16.0.0/12`)
+Developed by **Nandhakumar Murugan** ([github.com/nandhakumar-murugan](https://github.com/nandhakumar-murugan)).
 
 ---
 
-## 🌟 Key Features
+## 🌟 Features
 
-1. **💬 Interactive AI Chat & Code Generator**:
-   - Web UI for code generation with syntax highlighting, 1-click code copying, model switching, and custom system prompts.
-2. **⚡ Live Campus Cluster Dashboard**:
-   - Real-time topology map of active student nodes (`172.16.x.x`).
-   - Gauges for Pooled RAM/VRAM capacity, request latency, active queue, and Wi-Fi 6 bandwidth (`573.5 Mbps`).
-3. **🤝 Student Node Opt-In Interface**:
-   - 1-click modal for students to register their laptop into the hostel compute pool.
-4. **💻 VS Code & Developer Integration**:
-   - Auto-generates ready-to-copy configurations for `Continue.dev`, `Roo Code`, `Cline`, Python SDK, and cURL commands.
-5. **🔌 OpenAI & Ollama Compatible Endpoints**:
-   - Serves `/v1/chat/completions` and `/api/generate` locally on port `3000` / `11434`.
-
----
-
-## 💻 Hardware & Network Infrastructure
-
-* **Host Coordinator Node**: `NANDHAKUMAR` (`172.16.110.229` / `192.168.137.1`)
-* **Host Processor**: 12th Gen Intel(R) Core(TM) i5-1235U (12 Cores)
-* **System Memory**: 16 GB RAM
-* **Network Speed**: 573.5 Mbps (Wi-Fi 6 802.11ax, 5 GHz)
+* 🔷 **Google DeepMind Offline AI**: Native support for **Google Gemma 2 (2B & 9B)** and **Google Gemini Nano** running 100% offline on local hardware with zero external cloud dependencies.
+* ⚡ **Fault-Tolerant Distributed Campus Cluster**: Dynamically pools RAM/VRAM across active student laptops connected over campus Wi-Fi.
+* 🛡️ **Automatic Peer-to-Peer Failover**: If the primary coordinator server turns off, connected student browsers automatically failover to secondary worker nodes with zero data loss.
+* 💻 **Free VS Code Copilot Alternative**: Provides OpenAI-compatible `/v1/chat/completions` & `/v1/models` endpoints to power VS Code extensions (like Continue.dev) and Python scripts.
+* 📶 **Real-Time Network & System Telemetry**: Live WebSocket streams for host CPU usage, RAM stats, active network IP addresses, and Wi-Fi link speeds (573.5 Mbps).
+* 🤝 **1-Click Student Node Opt-In**: 1-click modal for students to register their laptop into the cluster compute pool.
 
 ---
 
 ## 🚀 Quick Start Guide
 
-### Prerequisites
-- Node.js (v18 or higher)
-- Connected to Campus Wi-Fi (`NMH-HOSTEL` or `kgisledu.com`)
+### 1. Requirements
+* **Node.js**: v18.0.0 or higher
+* **Python**: 3.10 or higher (with PyTorch and Transformers)
+* **Campus Network**: Wi-Fi 6 (`172.16.0.0/12` or `192.168.x.x`)
 
-### 1. Install & Run Server
+### 2. Installation
 ```bash
 git clone https://github.com/nandhakumar-murugan/campus-ai-portal.git
 cd campus-ai-portal
 npm install
+```
+
+### 3. Running the Campus Server
+```bash
 npm start
 ```
-
-### 2. Access the Portal on Campus
-Open your browser on any device (Laptop, Phone, Tablet) connected to campus Wi-Fi:
-```http
-http://172.16.110.229:3000
-```
-*(Or replacement local IP address of your host machine)*
+The portal will launch on **port 3000** and bind to all network interfaces (`0.0.0.0:3000`).
 
 ---
 
-## 🛠️ VS Code Integration (GitHub Copilot Alternative)
+## 👨‍💻 Author & Credits
 
-1. Install the **[Continue.dev](https://continue.dev)** extension in VS Code.
-2. Open `~/.continue/config.json` and paste the generated config snippet from the portal:
-
-```json
-{
-  "models": [
-    {
-      "title": "Campus AI (DeepSeek / Llama)",
-      "provider": "ollama",
-      "model": "deepseek-coder",
-      "apiBase": "http://172.16.110.229:3000"
-    }
-  ]
-}
-```
+* **Developer**: **Nandhakumar Murugan**
+* **GitHub Repository**: [https://github.com/nandhakumar-murugan/campus-ai-portal](https://github.com/nandhakumar-murugan/campus-ai-portal)
+* **Institution**: KGiSL Educational Institutions (`kgisledu.com`), Coimbatore, Tamil Nadu, India.
 
 ---
 
-## 🛡️ Architecture & Security
-- **100% Local**: No student prompts or code ever leave the `172.16.x.x` intranet.
-- **Zero Internet Data Used**: Inference occurs strictly inside the local Wi-Fi LAN.
-- **Fault-Tolerant**: Dynamic auto-failover if student laptops join or disconnect.
+## 📄 License
 
----
-*Created by **Nandhakumar Murugan** for KGiSL Educational Institutions (`kgisledu.com`) Hostel & Campus Community.*
+Distributed under the **MIT License**. Free for academic and educational use across campus networks.
