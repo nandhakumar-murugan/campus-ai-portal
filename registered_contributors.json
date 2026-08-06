@@ -1,14 +1,1 @@
-[
-  {
-    "id": "node-siva-01",
-    "name": "Siva (Campus Contributor)",
-    "ip": "172.16.194.19",
-    "type": "Campus Student Laptop",
-    "ramGB": 16,
-    "vramGB": 4,
-    "status": "Online",
-    "role": "Contributor Student Node",
-    "hasActiveLlm": false,
-    "latencyMs": 3
-  }
-]
+[]
