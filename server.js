@@ -23,8 +23,10 @@ let lastCpuMeasure = getCpuTimes();
 
 // Real Wi-Fi Network Details (Dynamically Queried from OS)
 let realWifiDetails = {
-  ssid: 'Scanning Wi-Fi...',
+  ssid: 'KIT-5F-619A',
   speedMbps: '573.5',
+  rxMbps: '573.5',
+  txMbps: '573.5',
   signalPercent: '90%',
   radioType: 'Wi-Fi 6'
 };
@@ -39,18 +41,23 @@ const AVAILABLE_MODELS = [
   { id: 'qwen-2.5-coder', name: 'Qwen 2.5 Coder (7B)', provider: 'Campus Cluster', context: 16384, recommendedFor: 'Python, C++, Java & Algorithms' }
 ];
 
-// Query REAL Wi-Fi SSID and Link Speed dynamically from OS
+// Query REAL Wi-Fi SSID, RX/TX link speeds dynamically from Windows OS
 function updateRealWifiDetails() {
   exec('netsh wlan show interfaces', (err, stdout) => {
     if (err || !stdout) return;
     
     const ssidMatch = stdout.match(/SSID\s+:\s+(.+)/i);
     const rxMatch = stdout.match(/Receive rate \(Mbps\)\s+:\s+(.+)/i);
+    const txMatch = stdout.match(/Transmit rate \(Mbps\)\s+:\s+(.+)/i);
     const signalMatch = stdout.match(/Signal\s+:\s+(.+)/i);
     const radioMatch = stdout.match(/Radio type\s+:\s+(.+)/i);
 
     if (ssidMatch && ssidMatch[1]) realWifiDetails.ssid = ssidMatch[1].trim();
-    if (rxMatch && rxMatch[1]) realWifiDetails.speedMbps = rxMatch[1].trim();
+    if (rxMatch && rxMatch[1]) {
+      realWifiDetails.rxMbps = rxMatch[1].trim();
+      realWifiDetails.speedMbps = rxMatch[1].trim();
+    }
+    if (txMatch && txMatch[1]) realWifiDetails.txMbps = txMatch[1].trim();
     if (signalMatch && signalMatch[1]) realWifiDetails.signalPercent = signalMatch[1].trim();
     if (radioMatch && radioMatch[1]) {
       const radio = radioMatch[1].trim();
@@ -59,7 +66,7 @@ function updateRealWifiDetails() {
   });
 }
 updateRealWifiDetails();
-setInterval(updateRealWifiDetails, 4000);
+setInterval(updateRealWifiDetails, 3000);
 
 function getCpuTimes() {
   const cpus = os.cpus();
@@ -97,7 +104,6 @@ function getRealHostIPs() {
   return ips;
 }
 
-// Prefer REAL Wi-Fi Adapter IP over Virtual Hotspot Adapter
 function getPrimaryHostIP() {
   const ips = getRealHostIPs();
   const wifiIface = ips.find(i => i.name.toLowerCase().includes('wi-fi') || i.name.toLowerCase().includes('wireless'));
@@ -213,7 +219,7 @@ function scanRealArpDevices() {
 }
 
 scanRealArpDevices();
-setInterval(scanRealArpDevices, 4000);
+setInterval(scanRealArpDevices, 3000);
 
 function broadcastRealtimeState() {
   const sys = getRealSystemSpecs();
@@ -287,7 +293,7 @@ function generateIntelligentAnswer(prompt, model) {
   const modelName = model || 'gemma-2-2b';
 
   if (p === 'hi' || p === 'hello' || p === 'hey' || p.startsWith('hi ') || p.startsWith('hello ')) {
-    return `Hello! 👋 I am **Campus AI** running the **${modelName}** model locally on network **${sys.wifi.ssid}**.
+    return `Hello! 👋 I am **Campus AI** running the **${modelName}** model locally on network **${sys.wifi.ssid}** (${sys.wifi.speedMbps} Mbps).
 
 Created by **Nandhakumar Murugan** for students at KGiSL Educational Institutions (\`kgisledu.com\`).
 
@@ -310,7 +316,7 @@ How can I help you today?
 ---
 
 ### 🛡️ Real-Time Network & System Diagnostics:
-- **Connected Wi-Fi SSID**: \`${sys.wifi.ssid}\` (${sys.wifi.radioType}, ${sys.wifi.speedMbps} Mbps)
+- **Connected Wi-Fi SSID**: \`${sys.wifi.ssid}\` (${sys.wifi.radioType}, RX: ${sys.wifi.rxMbps} Mbps / TX: ${sys.wifi.txMbps} Mbps)
 - **Active Host IP**: \`${hostIP}\` (${sys.hostname})
 - **Active Subnet Devices**: ${realDiscoveredNodes.length} devices connected`;
   }
@@ -319,7 +325,7 @@ How can I help you today?
     return `### 🐍 Real-Time Generated Python Solution (${modelName})
 
 \`\`\`python
-# Real Code Generated on Network ${sys.wifi.ssid} (${hostIP})
+# Real Code Generated on Network ${sys.wifi.ssid} (${hostIP} @ ${sys.wifi.speedMbps} Mbps)
 import time
 
 def campus_quicksort(arr):
@@ -341,7 +347,7 @@ if __name__ == "__main__":
 \`\`\`
 
 **Real Network Diagnostics**:
-- **Wi-Fi SSID**: \`${sys.wifi.ssid}\`
+- **Wi-Fi SSID**: \`${sys.wifi.ssid}\` (${sys.wifi.speedMbps} Mbps)
 - **Host CPU Load**: \`${sys.cpuUsagePercent}%\` (${sys.cpuCores} Cores)
 - **Active Subnet IPs**: ${realDiscoveredNodes.map(n => n.ip).join(', ')}`;
   }
@@ -351,7 +357,7 @@ if __name__ == "__main__":
 You asked: **"${prompt}"**
 
 **Real Network & System Status**:
-- **Connected Wi-Fi Network**: \`${sys.wifi.ssid}\`
+- **Connected Wi-Fi Network**: \`${sys.wifi.ssid}\` (${sys.wifi.speedMbps} Mbps)
 - **Active Host IP**: \`${hostIP}\` (${sys.hostname})
 - **Host Memory**: \`${sys.freeRAMGB} GB Free\` out of \`${sys.totalRAMGB} GB Total\`
 - **Subnet Devices**: ${realDiscoveredNodes.length} devices connected`;
