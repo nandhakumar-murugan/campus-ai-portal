@@ -1,18 +1,19 @@
 // ==========================================================================
-// CAMPUS AI SUPERCOMPUTER - REAL-TIME FRONTEND APPLICATION
-// Featuring Google Gemma 2 & Gemini Nano Offline On-Device Engine
+// CAMPUS AI SUPERCOMPUTER - AUTOMATIC CLIENT AUTO-CONNECT & REAL-TIME APP
+// Auto-detects and auto-registers visiting student devices on page load!
 // ==========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
   
   // Real-Time System State
   const state = {
-    hostIP: window.location.hostname || '172.16.110.229',
+    hostIP: window.location.hostname || '172.16.194.21',
     nodes: [],
     totals: { activeCount: 0, totalVRAM: 0, totalRAM: 0 },
     sys: { cpuUsagePercent: 0, ramUsagePercent: 0, totalRAMGB: 0, freeRAMGB: 0, usedRAMGB: 0, cpuCores: 0, cpuModel: '' },
     totalRequests: 0,
-    selectedModel: 'gemma-2-2b'
+    selectedModel: 'gemma-2-2b',
+    autoConnected: false
   };
 
   // DOM Elements
@@ -27,15 +28,52 @@ document.addEventListener('DOMContentLoaded', () => {
   const joinForm = document.getElementById('join-node-form');
   const joinSuccessMsg = document.getElementById('join-success-msg');
   const nodesTableBody = document.getElementById('nodes-table-body');
+  const autoConnectBanner = document.getElementById('auto-connect-banner');
 
   const canvas = document.getElementById('topology-canvas');
   const ctx = canvas ? canvas.getContext('2d') : null;
 
-  // Auto-detect visiting student device hardware
-  if (navigator.deviceMemory) {
-    const ramSelect = document.getElementById('ram-gb');
-    if (ramSelect) ramSelect.value = Math.min(64, Math.max(8, navigator.deviceMemory));
+  // AUTO-CONNECT VISITING DEVICE ON PAGE LOAD
+  async function autoConnectVisitingDevice() {
+    if (state.autoConnected) return;
+
+    const detectedRam = navigator.deviceMemory || 16;
+    const detectedCores = navigator.hardwareConcurrency || 8;
+    const userAgent = navigator.userAgent;
+    
+    let deviceName = 'Student Device';
+    if (userAgent.includes('Macintosh')) deviceName = 'MacBook Node';
+    else if (userAgent.includes('Windows')) deviceName = 'Windows Laptop Node';
+    else if (userAgent.includes('Android')) deviceName = 'Android Mobile Node';
+    else if (userAgent.includes('iPhone')) deviceName = 'iPhone Mobile Node';
+
+    try {
+      const res = await fetch('/api/cluster/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `${deviceName} (${detectedCores} Cores)`,
+          type: `${deviceName} (${detectedCores} CPU / ${detectedRam}GB RAM)`,
+          ramGB: detectedRam,
+          vramGB: 4,
+          userAgent: userAgent
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        state.autoConnected = true;
+        if (autoConnectBanner) {
+          autoConnectBanner.innerHTML = `🟢 <strong>Device Auto-Connected & Contributing!</strong> Your IP (<code>${data.node.ip}</code>) is live in the cluster with ${detectedRam}GB RAM.`;
+          autoConnectBanner.classList.remove('hidden');
+        }
+      }
+    } catch (err) {
+      console.log('Auto-connect attempt complete');
+    }
   }
+
+  // Trigger Auto-Connect 1 second after page load
+  setTimeout(autoConnectVisitingDevice, 1000);
 
   // Navigation Tab Switching
   navTabs.forEach(tab => {
@@ -97,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
       appendMessage('user', prompt);
       chatInput.value = '';
 
-      const assistantMsgDiv = appendMessage('assistant', `Evaluating prompt on ${state.selectedModel} offline engine...`, true);
+      const assistantMsgDiv = appendMessage('assistant', `Evaluating prompt on ${state.selectedModel} engine...`, true);
 
       try {
         const response = await fetch('/v1/chat/completions', {
@@ -189,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // VS Code Snippet Copy Buttons
+  // VS Code Copy Buttons
   document.querySelectorAll('.btn-copy').forEach(btn => {
     btn.addEventListener('click', () => {
       const targetId = btn.getAttribute('data-target');

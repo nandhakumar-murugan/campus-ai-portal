@@ -10,7 +10,7 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const PORT = process.env.PORT || 3000;
+let PORT = process.env.PORT || 3000;
 const HOST = '0.0.0.0';
 
 app.use(cors());
@@ -106,47 +106,62 @@ function getRealSystemSpecs() {
 
 let realDiscoveredNodes = [];
 
+async function checkNodeLlmStatus(ip) {
+  try {
+    const res = await fetch(`http://${ip}:11434/api/tags`, { signal: AbortSignal.timeout(600) });
+    return res.ok;
+  } catch (e) {
+    return false;
+  }
+}
+
 function scanRealArpDevices() {
-  exec('arp -a', (err, stdout) => {
+  exec('arp -a', async (err, stdout) => {
     const nodes = [];
     const hostIP = getPrimaryHostIP();
     const sys = getRealSystemSpecs();
 
+    const isHostLlmActive = await checkNodeLlmStatus('127.0.0.1');
+
     nodes.push({
       id: 'host-primary',
-      name: `Host (${sys.hostname})`,
+      name: `Primary Coordinator (${sys.hostname})`,
       ip: hostIP,
       type: `${sys.cpuCores}-Core ${sys.cpuModel}`,
       ramGB: sys.totalRAMGB,
       vramGB: 8,
       status: 'Online',
-      role: 'Host Coordinator',
+      role: 'Primary Leader Node',
+      hasActiveLlm: isHostLlmActive,
       latencyMs: 1
     });
 
     if (stdout) {
       const lines = stdout.split('\n');
-      lines.forEach(line => {
+      for (const line of lines) {
         const match = line.trim().match(/^(172\.16\.\d+\.\d+|192\.168\.\d+\.\d+)\s+([a-f0-9-]{17})\s+(dynamic|static)/i);
         if (match) {
           const ip = match[1];
           const mac = match[2];
           if (ip !== hostIP && !nodes.some(n => n.ip === ip)) {
             const isGateway = ip.endsWith('.1');
+            const hasLlm = isGateway ? false : await checkNodeLlmStatus(ip);
+            
             nodes.push({
               id: `arp-${ip.replace(/\./g, '-')}`,
-              name: isGateway ? 'Campus Gateway (Sophos Firewall)' : `Hostel Device (${ip})`,
+              name: isGateway ? 'Campus Gateway (Sophos Firewall)' : `Hostel Laptop Node (${ip})`,
               ip: ip,
               type: isGateway ? 'Sophos Firewall Router' : `Network Card (${mac.substring(0, 8)}...)`,
               ramGB: 16,
               vramGB: isGateway ? 0 : 4,
               status: 'Online',
-              role: isGateway ? 'Subnet Gateway' : 'Active Worker Node',
+              role: isGateway ? 'Subnet Gateway' : (hasLlm ? 'Backup Failover Leader Node' : 'Worker Node'),
+              hasActiveLlm: hasLlm,
               latencyMs: Math.floor(Math.random() * 4) + 2
             });
           }
         }
-      });
+      }
     }
 
     registeredNodes.forEach(rn => {
@@ -168,11 +183,14 @@ function broadcastRealtimeState() {
   const totalRAM = realDiscoveredNodes.reduce((acc, n) => acc + (n.ramGB || 16), 0);
   const totalVRAM = realDiscoveredNodes.reduce((acc, n) => acc + (n.vramGB || 4), 0);
 
+  const backupLeader = realDiscoveredNodes.find(n => n.ip !== getPrimaryHostIP() && n.role !== 'Subnet Gateway');
+
   const payload = JSON.stringify({
     type: 'REALTIME_UPDATE',
     hostIP: getPrimaryHostIP(),
     sys,
     nodes: realDiscoveredNodes,
+    backupLeaderIP: backupLeader ? backupLeader.ip : '172.16.108.6',
     totals: {
       activeCount: realDiscoveredNodes.length,
       totalRAM: Math.round(totalRAM),
@@ -189,9 +207,7 @@ function broadcastRealtimeState() {
   });
 }
 
-// Intelligent Conversational AI Engine
 async function processRealPrompt(prompt, model) {
-  // Check local Ollama GPU server if installed (e.g. gemma2:2b / llama3.2)
   try {
     const oRes = await fetch('http://127.0.0.1:11434/api/generate', {
       method: 'POST',
@@ -201,13 +217,29 @@ async function processRealPrompt(prompt, model) {
     });
     if (oRes.ok) {
       const oData = await oRes.json();
-      if (oData.response && oData.response.trim().length > 0) {
-        return oData.response;
-      }
+      if (oData.response && oData.response.trim().length > 0) return oData.response;
     }
   } catch (e) {}
 
-  // Local Conversational AI Knowledge Engine
+  for (const node of realDiscoveredNodes) {
+    if (node.ip !== getPrimaryHostIP() && node.hasActiveLlm) {
+      try {
+        const peerRes = await fetch(`http://${node.ip}:11434/api/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: model || 'gemma2:2b', prompt: prompt, stream: false }),
+          signal: AbortSignal.timeout(1200)
+        });
+        if (peerRes.ok) {
+          const pData = await peerRes.json();
+          if (pData.response && pData.response.trim().length > 0) {
+            return `[Generated via Failover Worker Node: ${node.name} (${node.ip})]\n\n${pData.response}`;
+          }
+        }
+      } catch (err) {}
+    }
+  }
+
   return generateIntelligentAnswer(prompt, model);
 }
 
@@ -217,39 +249,35 @@ function generateIntelligentAnswer(prompt, model) {
   const hostIP = getPrimaryHostIP();
   const modelName = model || 'gemma-2-2b';
 
-  // 1. Greetings & Introductions
   if (p === 'hi' || p === 'hello' || p === 'hey' || p.startsWith('hi ') || p.startsWith('hello ')) {
     return `Hello! 👋 I am **Campus AI** running the **${modelName}** model locally on your college intranet network.
 
-I am created by **Nandhakumar Murugan** for students at KGiSL Educational Institutions (\`kgisledu.com\`).
+Created by **Nandhakumar Murugan** for students at KGiSL Educational Institutions (\`kgisledu.com\`).
 
 How can I help you today?
 - 🐍 Write Python, C++, Java, or Web code
 - 🧠 Explain Artificial Intelligence, Algorithms, or Data Structures
-- 💻 Set up VS Code to use this AI for free
-- ⚡ Solves assignments and debug code errors`;
+- 💻 Set up VS Code to use this AI for free`;
   }
 
-  // 2. What is AI / Artificial Intelligence Explanation
   if (p.includes('what is ai') || p.includes('explain ai') || p.includes('definition of ai') || p.includes('artificial intelligence')) {
     return `### 🧠 What is Artificial Intelligence (AI)?
 
-**Artificial Intelligence (AI)** refers to computer systems and software capable of performing tasks that typically require human intelligence. These tasks include:
+**Artificial Intelligence (AI)** refers to computer systems and software capable of performing tasks that typically require human intelligence:
 
 1. **Reasoning & Problem Solving**: Analyzing complex data, solving math logic, and making decisions.
-2. **Natural Language Processing (NLP)**: Understanding, generating, and conversing in human languages (like ChatGPT, DeepSeek, or Google Gemma).
+2. **Natural Language Processing (NLP)**: Understanding, generating, and conversing in human languages.
 3. **Computer Vision**: Recognizing objects, faces, and text in images and videos.
 4. **Machine Learning (ML)**: Improving performance automatically through experience and data training.
 
 ---
 
-### 🔷 How This Campus AI Model Works:
-- **Model Selected**: \`${modelName}\`
-- **Execution Mode**: **100% Offline & On-Premise** running directly on Host \`${sys.hostname}\` (\`${hostIP}\`).
-- **Hardware**: Powered by your host's ${sys.cpuCores}-core CPU (${sys.cpuModel}) and ${sys.totalRAMGB} GB RAM across ${realDiscoveredNodes.length} active campus network nodes!`;
+### 🛡️ Campus Fault Tolerance & Failover:
+- **Active Model**: \`${modelName}\`
+- **Host Machine**: \`${sys.hostname}\` (\`${hostIP}\`)
+- **Active Subnet Devices**: ${realDiscoveredNodes.length} devices connected`;
   }
 
-  // 3. Coding & Algorithms Questions
   if (p.includes('python') || p.includes('code') || p.includes('sort') || p.includes('script') || p.includes('function') || p.includes('algorithm')) {
     return `### 🐍 Real-Time Generated Python Solution (${modelName})
 
@@ -272,9 +300,7 @@ def campus_quicksort(arr):
 
 if __name__ == "__main__":
     sample_data = [64, 34, 25, 12, 22, 11, 90]
-    print("Original List:", sample_data)
-    sorted_data = campus_quicksort(sample_data)
-    print("Sorted Output:", sorted_data)
+    print("Sorted Output:", campus_quicksort(sample_data))
 \`\`\`
 
 **Performance Metrics**:
@@ -282,32 +308,15 @@ if __name__ == "__main__":
 - **Active Subnet IPs**: ${realDiscoveredNodes.map(n => n.ip).join(', ')}`;
   }
 
-  // 4. Who created you / Creator question
-  if (p.includes('who created you') || p.includes('who made you') || p.includes('author') || p.includes('nandhakumar')) {
-    return `### 👤 Project Creator & Author
-
-I was developed by **Nandhakumar Murugan** for the students and hostel community at **KGiSL Educational Institutions** (\`kgisledu.com\`).
-
-- **Lead Developer**: Nandhakumar Murugan
-- **GitHub Repository**: [nandhakumar-murugan/campus-ai-portal](https://github.com/nandhakumar-murugan/campus-ai-portal)
-- **Host System**: \`${sys.hostname}\` (${sys.cpuCores} Cores, ${sys.totalRAMGB} GB RAM)`;
-  }
-
-  // 5. General Conversational Fallback
-  return `### 🧠 Response from ${modelName}
+  return `### 🧠 Campus AI Response (${modelName})
 
 You asked: **"${prompt}"**
 
-Artificial Intelligence models learn patterns from massive amounts of text and data to answer questions, write code, and assist with complex reasoning tasks. 
-
-**Campus Cluster Diagnostics**:
+**Live System & Failover Status**:
 - **Active Model**: \`${modelName}\`
-- **Host IP**: \`${hostIP}\`
-- **Host System**: \`${sys.hostname}\` (${sys.cpuCores} Cores @ ${sys.cpuUsagePercent}% CPU Load)
-- **Host Memory**: \`${sys.freeRAMGB} GB Available\` out of \`${sys.totalRAMGB} GB Total\`
-- **Subnet Nodes Connected**: ${realDiscoveredNodes.length} devices on campus Wi-Fi
-
-Feel free to ask me to write code, explain concepts, or solve homework problems!`;
+- **Primary Host**: \`${sys.hostname}\` (${sys.cpuCores} Cores @ ${sys.cpuUsagePercent}% CPU Load)
+- **Host Memory**: \`${sys.freeRAMGB} GB Free\` out of \`${sys.totalRAMGB} GB Total\`
+- **Subnet Devices**: ${realDiscoveredNodes.length} devices connected on campus Wi-Fi`;
 }
 
 // API Routes
@@ -342,16 +351,16 @@ app.post('/api/cluster/join', (req, res) => {
     ramGB: parseFloat(ramGB) || 16,
     vramGB: parseFloat(vramGB) || 4,
     status: 'Online',
-    role: 'Student Worker Node',
+    role: 'Backup Worker Node',
+    hasActiveLlm: false,
     latencyMs: Math.floor(Math.random() * 3) + 2
   };
 
   registeredNodes.push(newNode);
   scanRealArpDevices();
-  res.json({ success: true, node: newNode, message: 'Your real device has joined the campus AI cluster!' });
+  res.json({ success: true, node: newNode, message: 'Laptop registered into campus cluster!' });
 });
 
-// OpenAI API Endpoints
 app.get('/v1/models', (req, res) => {
   res.json({
     object: 'list',
@@ -390,7 +399,6 @@ app.post('/v1/chat/completions', async (req, res) => {
   }
 });
 
-// Ollama API Endpoint
 app.post('/api/generate', async (req, res) => {
   try {
     const { prompt, model } = req.body;
@@ -408,27 +416,22 @@ app.post('/api/generate', async (req, res) => {
   }
 });
 
-wss.on('connection', (ws) => {
-  const sys = getRealSystemSpecs();
-  ws.send(JSON.stringify({
-    type: 'REALTIME_UPDATE',
-    hostIP: getPrimaryHostIP(),
-    sys: getRealSystemSpecs(),
-    nodes: realDiscoveredNodes,
-    totals: {
-      activeCount: realDiscoveredNodes.length,
-      totalRAM: Math.round(realDiscoveredNodes.reduce((acc, n) => acc + (n.ramGB || 16), 0)),
-      totalVRAM: Math.round(realDiscoveredNodes.reduce((acc, n) => acc + (n.vramGB || 4), 0))
-    },
-    models: AVAILABLE_MODELS,
-    totalRequestsProcessed
-  }));
-});
+function startServer(portToTry) {
+  server.listen(portToTry, HOST, () => {
+    const ip = getPrimaryHostIP();
+    console.log(`=======================================================`);
+    console.log(`⚡ CAMPUS AI SERVER RUNNING SUCCESSFULLY ON PORT ${portToTry}`);
+    console.log(`🌐 Localhost Link: http://localhost:${portToTry}`);
+    console.log(`🌐 Campus Intranet Link: http://${ip}:${portToTry}`);
+    console.log(`=======================================================`);
+  }).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log(`⚠️ Port ${portToTry} in use. Automatically retrying on port ${portToTry + 1}...`);
+      startServer(portToTry + 1);
+    } else {
+      console.error('Server error:', err);
+    }
+  });
+}
 
-server.listen(PORT, HOST, () => {
-  const ip = getPrimaryHostIP();
-  console.log(`=======================================================`);
-  console.log(`⚡ CONVERSATIONAL CAMPUS AI SERVER RUNNING ON PORT ${PORT}`);
-  console.log(`🌐 Intranet Access: http://${ip}:${PORT}`);
-  console.log(`=======================================================`);
-});
+startServer(PORT);
