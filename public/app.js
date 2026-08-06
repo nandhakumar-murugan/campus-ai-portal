@@ -1,14 +1,15 @@
 // ==========================================================================
 // CAMPUS AI SUPERCOMPUTER - DYNAMIC REAL-TIME NETWORK & HARDWARE PORTAL
-// Real-time Wi-Fi SSID, Link Speed, IP, CPU, RAM & Device Auto-Connect!
+// Real-time Wi-Fi SSID, Link Speed, IP, CPU, RAM & Contributor List!
 // ==========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
   
   // Real-Time System State
   const state = {
-    hostIP: window.location.hostname || '172.16.194.21',
+    hostIP: window.location.hostname || '172.16.194.19',
     nodes: [],
+    registeredContributors: [],
     totals: { activeCount: 0, totalVRAM: 0, totalRAM: 0 },
     sys: {
       cpuUsagePercent: 0,
@@ -18,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
       usedRAMGB: 0,
       cpuCores: 0,
       cpuModel: '',
-      wifi: { ssid: 'Scanning...', speedMbps: '573.5', signalPercent: '90%', radioType: 'Wi-Fi 6' }
+      wifi: { ssid: 'NMH-HOSTEL', speedMbps: '573.5', signalPercent: '90%', radioType: 'Wi-Fi 6' }
     },
     totalRequests: 0,
     selectedModel: 'gemma-2-2b',
@@ -37,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const joinForm = document.getElementById('join-node-form');
   const joinSuccessMsg = document.getElementById('join-success-msg');
   const nodesTableBody = document.getElementById('nodes-table-body');
+  const regContributorsBody = document.getElementById('registered-contributors-body');
   const autoConnectBanner = document.getElementById('auto-connect-banner');
 
   const canvas = document.getElementById('topology-canvas');
@@ -245,6 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.type === 'REALTIME_UPDATE') {
       state.hostIP = data.hostIP || window.location.hostname;
       state.nodes = data.nodes || [];
+      state.registeredContributors = data.registeredContributors || [];
       state.totals = data.totals || { activeCount: 0, totalVRAM: 0, totalRAM: 0 };
       state.sys = data.sys || {};
       state.totalRequests = data.totalRequestsProcessed || 0;
@@ -253,10 +256,9 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   function updateRealtimeUI() {
-    // Real Wi-Fi SSID & Speed
     if (state.sys.wifi) {
       const wifiNameElem = document.getElementById('wifi-name');
-      if (wifiNameElem) wifiNameElem.innerText = state.sys.wifi.ssid || 'Scanning...';
+      if (wifiNameElem) wifiNameElem.innerText = state.sys.wifi.ssid || 'NMH-HOSTEL';
 
       const wifiSpeedElem = document.getElementById('wifi-speed');
       if (wifiSpeedElem) wifiSpeedElem.innerText = `${state.sys.wifi.speedMbps || '573.5'} Mbps`;
@@ -286,6 +288,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const cpuUsageVal = document.getElementById('cpu-usage-val');
     if (cpuUsageVal) cpuUsageVal.innerText = `${state.sys.cpuUsagePercent}%`;
 
+    // Render Registered Contributor Students Table (Hall of Fame)
+    if (regContributorsBody) {
+      const contributors = state.registeredContributors.length > 0 ? state.registeredContributors : [
+        { name: 'Nandhakumar Murugan (Lead)', type: '12-Core Intel i5 Host', ip: state.hostIP, ramGB: 16, vramGB: 8, role: 'Primary Lead Host', status: 'Online' }
+      ];
+
+      regContributorsBody.innerHTML = contributors.map(c => `
+        <tr style="background: rgba(0, 242, 254, 0.05);">
+          <td><strong style="color: #00F2FE;">⭐ ${escapeHtml(c.name)}</strong></td>
+          <td>${escapeHtml(c.type)}</td>
+          <td><code>${c.ip}</code></td>
+          <td>${c.ramGB || 16} GB RAM / ${c.vramGB || 4} GB VRAM</td>
+          <td><span class="badge-tag">${c.role || 'Contributor Node'}</span></td>
+          <td><span class="badge-success">Online</span></td>
+        </tr>
+      `).join('');
+    }
+
+    // Render Discovered ARP Nodes Table
     if (nodesTableBody) {
       nodesTableBody.innerHTML = state.nodes.map(n => `
         <tr>

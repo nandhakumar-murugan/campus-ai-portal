@@ -4,6 +4,7 @@ const WebSocket = require('ws');
 const path = require('path');
 const cors = require('cors');
 const os = require('os');
+const fs = require('fs');
 const { exec } = require('child_process');
 
 const app = express();
@@ -13,17 +14,33 @@ const wss = new WebSocket.Server({ server });
 let PORT = process.env.PORT || 3000;
 const HOST = '0.0.0.0';
 
+const CONTRIBUTORS_FILE = path.join(__dirname, 'registered_contributors.json');
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Load persisted contributor student registrations
 let registeredNodes = [];
+if (fs.existsSync(CONTRIBUTORS_FILE)) {
+  try {
+    registeredNodes = JSON.parse(fs.readFileSync(CONTRIBUTORS_FILE, 'utf8'));
+  } catch (e) {
+    registeredNodes = [];
+  }
+}
+
+function saveRegisteredNodes() {
+  try {
+    fs.writeFileSync(CONTRIBUTORS_FILE, JSON.stringify(registeredNodes, null, 2), 'utf8');
+  } catch (e) {}
+}
+
 let totalRequestsProcessed = 0;
 let lastCpuMeasure = getCpuTimes();
 
-// Real Wi-Fi Network Details (Dynamically Queried from OS)
 let realWifiDetails = {
-  ssid: 'KIT-5F-619A',
+  ssid: 'NMH-HOSTEL',
   speedMbps: '573.5',
   rxMbps: '573.5',
   txMbps: '573.5',
@@ -41,7 +58,6 @@ const AVAILABLE_MODELS = [
   { id: 'qwen-2.5-coder', name: 'Qwen 2.5 Coder (7B)', provider: 'Campus Cluster', context: 16384, recommendedFor: 'Python, C++, Java & Algorithms' }
 ];
 
-// Query REAL Wi-Fi SSID, RX/TX link speeds dynamically from Windows OS
 function updateRealWifiDetails() {
   exec('netsh wlan show interfaces', (err, stdout) => {
     if (err || !stdout) return;
@@ -179,6 +195,14 @@ function scanRealArpDevices() {
       latencyMs: 1
     });
 
+    // 1. FIRST INJECT ALL MANUALLY REGISTERED CONTRIBUTOR STUDENTS (like Siva)
+    registeredNodes.forEach(rn => {
+      if (!nodes.some(n => n.ip === rn.ip || n.name === rn.name)) {
+        nodes.push(rn);
+      }
+    });
+
+    // 2. DISCOVER SUBNET ARP DEVICES
     if (stdout) {
       const lines = stdout.split('\n');
       for (const line of lines) {
@@ -207,12 +231,6 @@ function scanRealArpDevices() {
       }
     }
 
-    registeredNodes.forEach(rn => {
-      if (!nodes.some(n => n.ip === rn.ip)) {
-        nodes.push(rn);
-      }
-    });
-
     realDiscoveredNodes = nodes;
     broadcastRealtimeState();
   });
@@ -233,6 +251,7 @@ function broadcastRealtimeState() {
     hostIP: getPrimaryHostIP(),
     sys,
     nodes: realDiscoveredNodes,
+    registeredContributors: registeredNodes,
     backupLeaderIP: backupLeader ? backupLeader.ip : '172.16.108.6',
     totals: {
       activeCount: realDiscoveredNodes.length,
@@ -378,6 +397,7 @@ app.get('/api/cluster/metrics', (req, res) => {
       totalVRAM: Math.round(totalVRAM)
     },
     nodes: realDiscoveredNodes,
+    registeredContributors: registeredNodes,
     models: AVAILABLE_MODELS,
     totalRequestsProcessed
   });
@@ -387,20 +407,28 @@ app.post('/api/cluster/join', (req, res) => {
   const { name, type, ramGB, vramGB, userAgent } = req.body;
   const clientIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress.replace('::ffff:', '');
   
+  const existingIdx = registeredNodes.findIndex(rn => rn.ip === clientIP || (name && rn.name.toLowerCase() === name.toLowerCase()));
+
   const newNode = {
     id: `node-${Date.now()}`,
     name: name || `Student Laptop (${clientIP})`,
     ip: clientIP === '127.0.0.1' ? getPrimaryHostIP() : clientIP,
-    type: type || (userAgent ? userAgent.substring(0, 30) : 'Student Laptop'),
+    type: type || (userAgent ? userAgent.substring(0, 35) : 'Student Laptop'),
     ramGB: parseFloat(ramGB) || 16,
     vramGB: parseFloat(vramGB) || 4,
     status: 'Online',
-    role: 'Backup Worker Node',
+    role: 'Contributor Student Node',
     hasActiveLlm: false,
     latencyMs: Math.floor(Math.random() * 3) + 2
   };
 
-  registeredNodes.push(newNode);
+  if (existingIdx >= 0) {
+    registeredNodes[existingIdx] = newNode;
+  } else {
+    registeredNodes.push(newNode);
+  }
+
+  saveRegisteredNodes();
   scanRealArpDevices();
   res.json({ success: true, node: newNode, message: 'Laptop registered into campus cluster!' });
 });

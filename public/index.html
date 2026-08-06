@@ -29,15 +29,15 @@
     <div class="network-status-bar">
       <div class="status-pill wifi-pill">
         <span class="wifi-dot"></span>
-        <span class="pill-label">Wi-Fi 6:</span>
-        <strong id="wifi-name">NMH-HOSTEL</strong>
+        <span class="pill-label">Wi-Fi:</span>
+        <strong id="wifi-name">Scanning...</strong>
         <span class="speed-tag" id="wifi-speed">573.5 Mbps</span>
       </div>
 
       <div class="status-pill ip-pill">
         <span class="pill-icon">🌐</span>
         <span class="pill-label">Host IP:</span>
-        <code id="host-ip">172.16.194.21</code>
+        <code id="host-ip">172.16.194.19</code>
       </div>
 
       <div class="status-pill nodes-pill">
@@ -127,7 +127,6 @@
           </div>
 
           <div id="chat-messages" class="chat-messages">
-            <!-- Welcome Assistant Message -->
             <div class="message assistant-msg">
               <div class="msg-avatar">🔷</div>
               <div class="msg-content">
@@ -191,6 +190,27 @@
           </div>
         </div>
 
+        <!-- Registered Contributor Students List Card -->
+        <div class="nodes-table-card grid-col-span-2" style="border: 1px solid rgba(0, 242, 254, 0.4); background: rgba(11, 15, 23, 0.85);">
+          <h3>⭐ Registered Contributor Students & Laptops (Hall of Fame)</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">Students who have registered their device name to contribute RAM/compute to the campus AI supercomputer.</p>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Contributor Student / Device Name</th>
+                <th>Hardware / Laptop Spec</th>
+                <th>Campus IP</th>
+                <th>RAM / VRAM</th>
+                <th>Contributor Role</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="registered-contributors-body">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+
         <!-- Interactive Topology Canvas -->
         <div class="topology-card grid-col-span-2">
           <div class="card-header">
@@ -202,7 +222,7 @@
           </div>
         </div>
 
-        <!-- Connected Nodes Table -->
+        <!-- Discovered ARP Network Devices Table -->
         <div class="nodes-table-card grid-col-span-2">
           <h3>📋 Live Discovered ARP Network Devices Table</h3>
           <table class="data-table">
@@ -237,7 +257,7 @@
         <form id="join-node-form" class="join-form">
           <div class="form-group">
             <label for="node-name">Device Name / Student Identifier</label>
-            <input type="text" id="node-name" placeholder="e.g., Alex's Laptop / Hostel B-204" required>
+            <input type="text" id="node-name" placeholder="e.g., Siva's Laptop / Hostel B-204" required>
           </div>
 
           <div class="form-row">
@@ -247,7 +267,7 @@
                 <option value="Dedicated Gaming Laptop (NVIDIA RTX)">NVIDIA RTX Gaming Laptop</option>
                 <option value="Apple Silicon (M1/M2/M3/M4)">Apple Silicon Mac (Unified RAM)</option>
                 <option value="Desktop Workstation">Desktop Workstation PC</option>
-                <option value="Standard Student Laptop">Standard Intel/AMD Laptop</option>
+                <option value="Standard Student Laptop" selected>Standard Intel/AMD Laptop</option>
               </select>
             </div>
 
