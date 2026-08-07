@@ -1,1 +1,124 @@
-[]
+[
+  {
+    "id": "node-1786006876210",
+    "name": "sivashankar",
+    "ip": "172.16.206.184",
+    "type": "Dedicated Gaming Laptop (NVIDIA RTX)",
+    "ramGB": 16,
+    "vramGB": 6,
+    "status": "Online",
+    "role": "Contributor Student Node",
+    "hasActiveLlm": false,
+    "latencyMs": 4
+  },
+  {
+    "id": "node-1786008491653",
+    "name": "Windows Laptop Node (12 Cores)",
+    "ip": "172.16.49.168",
+    "type": "Windows Laptop Node (12 CPU / 16GB RAM)",
+    "ramGB": 16,
+    "vramGB": 4,
+    "status": "Online",
+    "role": "Contributor Student Node",
+    "hasActiveLlm": false,
+    "latencyMs": 3,
+    "scanResults": {
+      "ip": "172.16.49.168",
+      "pingMs": 1,
+      "reachable": true,
+      "detectedFeatures": [
+        {
+          "name": "NetBIOS",
+          "port": 139,
+          "status": "active",
+          "icon": "🔗"
+        },
+        {
+          "name": "SMB File Sharing",
+          "port": 445,
+          "status": "active",
+          "icon": "📁"
+        },
+        {
+          "name": "Node.js Server",
+          "port": 3000,
+          "status": "active",
+          "icon": "🟢"
+        }
+      ],
+      "missingFeatures": [
+        {
+          "name": "SSH Server",
+          "port": 22,
+          "icon": "🔐",
+          "description": "Secure shell access",
+          "installUrl": "https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse",
+          "installCmd": "Add-WindowsCapability -Online -Name OpenSSH.Server",
+          "benefit": "Remote terminal access for automation",
+          "status": "not_found"
+        },
+        {
+          "name": "Python API (Flask)",
+          "port": 5000,
+          "icon": "🐍",
+          "description": "Python REST API server",
+          "installUrl": "https://flask.palletsprojects.com",
+          "installCmd": "pip install flask",
+          "benefit": "Serve custom ML models via API",
+          "status": "not_found"
+        },
+        {
+          "name": "Gradio",
+          "port": 7860,
+          "icon": "🎨",
+          "description": "Build AI web apps instantly",
+          "installUrl": "https://gradio.app",
+          "installCmd": "pip install gradio",
+          "benefit": "Create AI demos in 5 lines of Python",
+          "status": "not_found"
+        },
+        {
+          "name": "Python API (FastAPI)",
+          "port": 8000,
+          "icon": "⚡",
+          "description": "High-performance Python API",
+          "installUrl": "https://fastapi.tiangolo.com",
+          "installCmd": "pip install fastapi uvicorn",
+          "benefit": "Async Python API for real-time AI",
+          "status": "not_found"
+        },
+        {
+          "name": "Streamlit",
+          "port": 8501,
+          "icon": "📊",
+          "description": "Data science dashboards",
+          "installUrl": "https://streamlit.io",
+          "installCmd": "pip install streamlit",
+          "benefit": "Build interactive ML dashboards",
+          "status": "not_found"
+        },
+        {
+          "name": "Jupyter Notebook",
+          "port": 8888,
+          "icon": "📓",
+          "description": "Shared GPU notebook for ML",
+          "installUrl": "https://jupyter.org/install",
+          "installCmd": "pip install jupyter",
+          "benefit": "Share GPU-powered notebooks with classmates",
+          "status": "not_found"
+        },
+        {
+          "name": "Ollama (Local LLM)",
+          "port": 11434,
+          "icon": "🤖",
+          "description": "Run AI models locally on GPU",
+          "installUrl": "https://ollama.com/download",
+          "installCmd": "winget install Ollama.Ollama",
+          "benefit": "Your GPU can run AI models 5x faster than CPU!",
+          "status": "not_found"
+        }
+      ],
+      "scannedAt": "2026-08-07T03:35:52.400Z"
+    }
+  }
+]

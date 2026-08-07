@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VS Code & Developer Setup | Campus AI Supercomputer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo-icon">⚡</div>
+      <div class="brand-text">
+        <h1>Campus AI <span class="badge-tag">Supercomputer</span></h1>
+        <p class="brand-sub">Created by <strong>Nandhakumar Murugan</strong> • <code>kgisledu.com</code> Network</p>
+      </div>
+    </div>
+    <div class="network-status-bar">
+      <div class="status-pill wifi-pill">
+        <span class="wifi-dot"></span>
+        <span class="pill-label">Wi-Fi:</span>
+        <strong id="wifi-name">Scanning...</strong>
+        <span class="speed-tag" id="wifi-speed">-- Mbps</span>
+        <span class="signal-tag" id="wifi-signal">📶 --%</span>
+      </div>
+      <div class="status-pill ip-pill">
+        <span class="pill-icon">🌐</span>
+        <span class="pill-label">Host IP:</span>
+        <code id="host-ip">Scanning...</code>
+      </div>
+      <div class="status-pill nodes-pill">
+        <span class="pill-icon">💻</span>
+        <span class="pill-label">Active Nodes:</span>
+        <strong id="active-nodes-count">Scanning...</strong>
+      </div>
+    </div>
+  </header>
+
+  <div id="auto-connect-banner" class="alert-box success-alert hidden" style="max-width: 1400px; margin: 1rem auto -0.5rem; text-align: center;">
+    🟢 <strong>Device Auto-Connected & Contributing!</strong>
+  </div>
+
+  <nav class="nav-tabs-container">
+    <a href="index.html" class="nav-link" data-page="index.html">
+      <span class="tab-icon">💬</span> AI Studio & Code Generator
+    </a>
+    <a href="cluster.html" class="nav-link" data-page="cluster.html">
+      <span class="tab-icon">⚡</span> Real-Time Cluster Monitor
+    </a>
+    <a href="join.html" class="nav-link" data-page="join.html">
+      <span class="tab-icon">🤝</span> Join Compute Pool
+    </a>
+    <a href="setup.html" class="nav-link" data-page="setup.html">
+      <span class="tab-icon">💻</span> VS Code & Developer Setup
+    </a>
+  </nav>
+
+  <main class="content-container">
+    <section id="vscode-setup">
+      <div class="setup-container">
+        <div class="setup-header">
+          <h2>💻 Free GitHub Copilot Alternative (Google Gemma Offline) inside VS Code</h2>
+          <p>Connect VS Code, Cursor, or python projects directly to your campus server running Google Gemma models offline.</p>
+        </div>
+
+        <div class="setup-steps-grid">
+
+          <!-- Step 1: VS Code Continue -->
+          <div class="setup-card">
+            <div class="step-num">1</div>
+            <h3>VS Code (Continue.dev Extension)</h3>
+            <p>1. Install <strong>Continue</strong> from VS Code Extensions.<br>
+               2. Open <code>~/.continue/config.json</code> and paste:</p>
+            <div class="code-block-wrapper">
+              <pre><code id="code-continue">Loading real IP config...</code></pre>
+              <button class="btn-copy" data-target="code-continue" onclick="copySnippet(this)">Copy Config</button>
+            </div>
+          </div>
+
+          <!-- Step 2: Python Script SDK -->
+          <div class="setup-card">
+            <div class="step-num">2</div>
+            <h3>Python OpenAI SDK</h3>
+            <p>Use standard OpenAI library pointing to your campus server:</p>
+            <div class="code-block-wrapper">
+              <pre><code id="code-python">Loading real Python code...</code></pre>
+              <button class="btn-copy" data-target="code-python" onclick="copySnippet(this)">Copy Python Code</button>
+            </div>
+          </div>
+
+          <!-- Step 3: cURL Command -->
+          <div class="setup-card">
+            <div class="step-num">3</div>
+            <h3>cURL Terminal Command</h3>
+            <p>Query directly from PowerShell or Terminal:</p>
+            <div class="code-block-wrapper">
+              <pre><code id="code-curl">Loading real cURL command...</code></pre>
+              <button class="btn-copy" data-target="code-curl" onclick="copySnippet(this)">Copy cURL</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="common.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      window.copySnippet = function(btn) {
+        const code = btn.previousElementSibling.innerText;
+        navigator.clipboard.writeText(code);
+        btn.innerText = 'Copied! ✅';
+        setTimeout(() => {
+          if (btn.getAttribute('data-target') === 'code-continue') btn.innerText = 'Copy Config';
+          else if (btn.getAttribute('data-target') === 'code-python') btn.innerText = 'Copy Python Code';
+          else btn.innerText = 'Copy cURL';
+        }, 2000);
+      };
+
+      window.addEventListener('clusterUpdate', (e) => {
+        const data = e.detail;
+        if (!data) return;
+        
+        const currentIP = data.hostIP || window.location.hostname;
+        const port = window.location.port || '3000';
+        const fullHost = `${currentIP}:${port}`;
+
+        const codeContinue = document.getElementById('code-continue');
+        if (codeContinue) {
+          codeContinue.innerText = `{
+  "models": [
+    {
+      "title": "Google Gemma 2 (Offline)",
+      "provider": "ollama",
+      "model": "gemma2:2b",
+      "apiBase": "http://${fullHost}"
+    }
+  ]
+}`;
+        }
+
+        const codePython = document.getElementById('code-python');
+        if (codePython) {
+          codePython.innerText = `from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://${fullHost}/v1",
+    api_key="gemma-offline"
+)
+
+response = client.chat.completions.create(
+    model="gemma-2-2b",
+    messages=[{"role": "user", "content": "Write a Python script"}]
+)
+
+print(response.choices[0].message.content)`;
+        }
+
+        const codeCurl = document.getElementById('code-curl');
+        if (codeCurl) {
+          codeCurl.innerText = `curl http://${fullHost}/v1/chat/completions \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "gemma-2-2b",
+    "messages": [{"role": "user", "content": "Explain Quicksort"}]
+  }'`;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

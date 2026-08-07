@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join Compute Pool | Campus AI Supercomputer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ===== CONTRIBUTOR DASHBOARD STYLES ===== */
+    .contributor-dashboard {
+      margin-top: 2rem;
+      padding: 2rem;
+      background: rgba(11, 15, 23, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 242, 254, 0.2);
+      border-radius: 16px;
+      animation: dashFadeIn 0.5s ease;
+    }
+    @keyframes dashFadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .dashboard-header { margin-bottom: 1.5rem; }
+    .dashboard-header h2 {
+      font-size: 1.6rem;
+      background: linear-gradient(135deg, #00F2FE, #9D4EDD);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.3rem;
+    }
+    .dashboard-header p { color: #94A3B8; font-size: 0.9rem; }
+    .scan-status { margin-top: 1rem; }
+    #scan-status-text { font-size: 0.85rem; color: #94A3B8; }
+    .scan-progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 99px;
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+    .scan-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00F2FE, #9D4EDD);
+      border-radius: 99px;
+      transition: width 0.6s ease;
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.5);
+    }
+
+    /* Device Info Card */
+    .device-info-card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(0, 242, 254, 0.25);
+      border-radius: 12px;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .device-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .device-icon { font-size: 2.5rem; }
+    .device-header h3 { color: #F1F5F9; font-size: 1.15rem; }
+    .device-header p { color: #94A3B8; font-size: 0.85rem; font-family: 'Fira Code', monospace; }
+    .ping-badge {
+      margin-left: auto;
+      background: rgba(0, 242, 254, 0.15);
+      color: #00F2FE;
+      padding: 0.3rem 0.8rem;
+      border-radius: 99px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: 'Fira Code', monospace;
+    }
+
+    /* Features Section */
+    .features-section { margin-bottom: 1.5rem; }
+    .section-title {
+      font-size: 1.15rem;
+      color: #F1F5F9;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .section-desc { color: #94A3B8; font-size: 0.88rem; margin-bottom: 1rem; }
+
+    /* Active Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8rem;
+    }
+    @media (max-width: 900px) { .features-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .features-grid { grid-template-columns: 1fr; } }
+
+    .feature-card {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.15);
+    }
+    .feature-icon { font-size: 1.6rem; }
+    .feature-info strong { display: block; color: #F1F5F9; font-size: 0.9rem; }
+    .feature-port {
+      font-size: 0.75rem;
+      color: #94A3B8;
+      font-family: 'Fira Code', monospace;
+    }
+    .feature-status {
+      margin-left: auto;
+      font-size: 0.8rem;
+      color: #22C55E;
+      font-weight: 600;
+    }
+
+    /* Install Recommendations Grid */
+    .install-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 768px) { .install-grid { grid-template-columns: 1fr; } }
+
+    .install-card {
+      background: rgba(19, 27, 46, 0.7);
+      border: 1px solid rgba(157, 78, 221, 0.3);
+      border-radius: 12px;
+      padding: 1.2rem;
+      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    }
+    .install-card:hover {
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 8px 25px rgba(157, 78, 221, 0.2);
+      border-color: rgba(0, 242, 254, 0.4);
+    }
+    .install-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0.7rem;
+    }
+    .install-icon { font-size: 1.8rem; }
+    .install-header strong { color: #F1F5F9; font-size: 1rem; }
+    .install-port {
+      display: block;
+      font-size: 0.72rem;
+      color: #64748B;
+      font-family: 'Fira Code', monospace;
+    }
+    .install-desc { color: #94A3B8; font-size: 0.85rem; margin-bottom: 0.5rem; }
+    .install-benefit {
+      color: #F59E0B;
+      font-size: 0.82rem;
+      font-weight: 500;
+      margin-bottom: 0.8rem;
+      background: rgba(245, 158, 11, 0.08);
+      padding: 0.4rem 0.6rem;
+      border-radius: 6px;
+    }
+    .install-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .install-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #9D4EDD, #00F2FE);
+      color: #fff;
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .install-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(157, 78, 221, 0.5);
+    }
+    .cmd-copy-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 0.35rem 0.7rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex: 1;
+      min-width: 0;
+    }
+    .cmd-copy-btn:hover { background: rgba(255,255,255,0.1); }
+    .cmd-copy-btn code {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.72rem;
+      color: #00F2FE;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .copy-icon { font-size: 0.85rem; cursor: pointer; }
+
+    .no-features-msg {
+      color: #94A3B8;
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo-icon">⚡</div>
+      <div class="brand-text">
+        <h1>Campus AI <span class="badge-tag">Supercomputer</span></h1>
+        <p class="brand-sub">Created by <strong>Nandhakumar Murugan</strong> • <code>kgisledu.com</code> Network</p>
+      </div>
+    </div>
+    <div class="network-status-bar">
+      <div class="status-pill wifi-pill">
+        <span class="wifi-dot"></span>
+        <span class="pill-label">Wi-Fi:</span>
+        <strong id="wifi-name">Scanning...</strong>
+        <span class="speed-tag" id="wifi-speed">-- Mbps</span>
+        <span class="signal-tag" id="wifi-signal">📶 --%</span>
+      </div>
+      <div class="status-pill ip-pill">
+        <span class="pill-icon">🌐</span>
+        <span class="pill-label">Host IP:</span>
+        <code id="host-ip">Scanning...</code>
+      </div>
+      <div class="status-pill nodes-pill">
+        <span class="pill-icon">💻</span>
+        <span class="pill-label">Active Nodes:</span>
+        <strong id="active-nodes-count">Scanning...</strong>
+      </div>
+    </div>
+  </header>
+
+  <div id="auto-connect-banner" class="alert-box success-alert hidden" style="max-width: 1400px; margin: 1rem auto -0.5rem; text-align: center;">
+    🟢 <strong>Device Auto-Connected & Contributing!</strong>
+  </div>
+
+  <nav class="nav-tabs-container">
+    <a href="index.html" class="nav-link"><span class="tab-icon">💬</span> AI Studio & Code Generator</a>
+    <a href="cluster.html" class="nav-link"><span class="tab-icon">⚡</span> Real-Time Cluster Monitor</a>
+    <a href="join.html" class="nav-link active"><span class="tab-icon">🤝</span> Join Compute Pool</a>
+    <a href="setup.html" class="nav-link"><span class="tab-icon">💻</span> VS Code & Developer Setup</a>
+  </nav>
+
+  <main class="content-container">
+
+    <!-- Registration Form -->
+    <section id="join-node">
+      <div class="form-container-card">
+        <div class="form-header">
+          <h2>🤝 Contribute Your Laptop to the Campus Supercomputer</h2>
+          <p>By connecting your laptop into the pool, you contribute idle RAM/VRAM to help run Google Gemma 2 and DeepSeek models for the entire campus community.</p>
+        </div>
+
+        <form id="join-node-form" class="join-form">
+          <div class="form-group">
+            <label for="node-name">Device Name / Student Identifier</label>
+            <input type="text" id="node-name" placeholder="e.g., Siva (Campus Contributor)" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="device-type">Device Hardware Type</label>
+              <select id="device-type" class="custom-select">
+                <option value="Dedicated Gaming Laptop (NVIDIA RTX)">NVIDIA RTX Gaming Laptop</option>
+                <option value="Apple Silicon (M1/M2/M3/M4)">Apple Silicon Mac (Unified RAM)</option>
+                <option value="Desktop Workstation">Desktop Workstation PC</option>
+                <option value="Standard Student Laptop" selected>Standard Intel/AMD Laptop</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="vram-gb">Contributed VRAM (GB)</label>
+              <select id="vram-gb" class="custom-select">
+                <option value="4">4 GB VRAM</option>
+                <option value="6">6 GB VRAM</option>
+                <option value="8" selected>8 GB VRAM</option>
+                <option value="12">12 GB VRAM</option>
+                <option value="16">16 GB VRAM</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ram-gb">System RAM (GB)</label>
+              <select id="ram-gb" class="custom-select">
+                <option value="8">8 GB RAM</option>
+                <option value="16" selected>16 GB RAM</option>
+                <option value="32">32 GB RAM</option>
+                <option value="64">64 GB RAM</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary btn-large">
+            <span>Register Laptop into Campus AI Cluster</span> 🚀
+          </button>
+        </form>
+
+        <div id="join-success-msg" class="alert-box success-alert hidden">
+          ✅ <strong>Registration Successful!</strong> Your laptop is now registered as an active worker node in the campus cluster topology.
+        </div>
+      </div>
+    </section>
+
+    <!-- System Capabilities Dashboard (auto-shows for all visitors) -->
+    <div id="contributor-dashboard" class="contributor-dashboard" style="display:none;">
+      <div class="dashboard-header">
+        <h2>🔍 Your System Capabilities Dashboard</h2>
+        <p>We scanned your device to show what you can contribute to the campus AI grid</p>
+        <div class="scan-status">
+          <span id="scan-status-text">Scanning your device...</span>
+          <div class="scan-progress-bar"><div class="scan-progress-fill" id="scan-progress"></div></div>
+        </div>
+      </div>
+
+      <div class="device-info-card" id="device-info-card">
+        <div class="device-header">
+          <span class="device-icon">💻</span>
+          <div>
+            <h3 id="dash-device-name">Your Device</h3>
+            <p id="dash-device-ip">IP: Scanning...</p>
+          </div>
+          <span class="ping-badge" id="dash-ping">-- ms</span>
+        </div>
+      </div>
+
+      <div class="features-section">
+        <h3 class="section-title">✅ Active Features on Your System</h3>
+        <div class="features-grid" id="active-features-grid">
+          <p class="no-features-msg">Scanning ports...</p>
+        </div>
+      </div>
+
+      <div class="features-section">
+        <h3 class="section-title">🚀 Recommended Installations to Boost Your Contribution</h3>
+        <p class="section-desc">Install these tools to unlock more power for the campus AI grid</p>
+        <div class="install-grid" id="install-recommendations-grid">
+          <p class="no-features-msg">Scanning for recommendations...</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="common.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const joinForm = document.getElementById('join-node-form');
+      const joinSuccessMsg = document.getElementById('join-success-msg');
+      const dashboard = document.getElementById('contributor-dashboard');
+      const activeFeaturesGrid = document.getElementById('active-features-grid');
+      const installGrid = document.getElementById('install-recommendations-grid');
+
+      // === SCAN FUNCTION ===
+      window.scanContributorDevice = async function(deviceName, deviceIP) {
+        if (!dashboard) return;
+
+        // Show dashboard
+        dashboard.style.display = 'block';
+        document.getElementById('dash-device-name').textContent = deviceName || 'Your Device';
+        document.getElementById('dash-device-ip').textContent = 'IP: ' + (deviceIP || 'detecting...');
+        document.getElementById('scan-status-text').textContent = 'Scanning your device ports & services...';
+
+        const progressEl = document.getElementById('scan-progress');
+        progressEl.style.width = '20%';
+
+        try {
+          progressEl.style.width = '40%';
+          const res = await fetch('/api/cluster/scan-device', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ip: deviceIP })
+          });
+
+          progressEl.style.width = '75%';
+          const scan = await res.json();
+
+          // Update ping
+          document.getElementById('dash-ping').textContent = scan.pingMs + ' ms';
+
+          // Render active features
+          if (scan.detectedFeatures && scan.detectedFeatures.length > 0) {
+            activeFeaturesGrid.innerHTML = scan.detectedFeatures.map(f => `
+              <div class="feature-card">
+                <span class="feature-icon">${f.icon}</span>
+                <div class="feature-info">
+                  <strong>${f.name}</strong>
+                  <span class="feature-port">Port ${f.port}</span>
+                </div>
+                <span class="feature-status">✅ Active</span>
+              </div>
+            `).join('');
+          } else {
+            activeFeaturesGrid.innerHTML = '<p class="no-features-msg">No active services detected. Install tools below to start contributing!</p>';
+          }
+
+          // Render install recommendations
+          if (scan.missingFeatures && scan.missingFeatures.length > 0) {
+            installGrid.innerHTML = scan.missingFeatures.map(f => `
+              <div class="install-card">
+                <div class="install-header">
+                  <span class="install-icon">${f.icon}</span>
+                  <div>
+                    <strong>${f.name}</strong>
+                    <span class="install-port">Port ${f.port}</span>
+                  </div>
+                </div>
+                <p class="install-desc">${f.description}</p>
+                <p class="install-benefit">💡 ${f.benefit}</p>
+                <div class="install-actions">
+                  <a href="${f.installUrl}" target="_blank" class="install-btn">📥 Download</a>
+                  <div class="cmd-copy-btn" onclick="window.copyCmd(this, '${f.installCmd.replace(/'/g, "\\'")}')">
+                    <code>${f.installCmd}</code>
+                    <span class="copy-icon">📋</span>
+                  </div>
+                </div>
+              </div>
+            `).join('');
+          } else {
+            installGrid.innerHTML = '<p class="no-features-msg">All recommended services are already running! 🎉</p>';
+          }
+
+          progressEl.style.width = '100%';
+          document.getElementById('scan-status-text').textContent = 
+            '✅ Scan complete! ' + scan.detectedFeatures.length + ' active services, ' + scan.missingFeatures.length + ' available to install';
+
+        } catch (err) {
+          progressEl.style.width = '100%';
+          document.getElementById('scan-status-text').textContent = '⚠️ Scan timed out. Some features may not be detected.';
+        }
+      };
+
+      window.copyCmd = function(el, cmd) {
+        navigator.clipboard.writeText(cmd);
+        el.querySelector('.copy-icon').textContent = '✅';
+        setTimeout(() => el.querySelector('.copy-icon').textContent = '📋', 2000);
+      };
+
+      // === JOIN FORM HANDLER ===
+      if (joinForm) {
+        joinForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const payload = {
+            name: document.getElementById('node-name').value,
+            type: document.getElementById('device-type').value,
+            vramGB: document.getElementById('vram-gb').value,
+            ramGB: document.getElementById('ram-gb').value,
+            userAgent: navigator.userAgent
+          };
+
+          try {
+            const res = await fetch('/api/cluster/join', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+              joinSuccessMsg.classList.remove('hidden');
+              joinForm.reset();
+              setTimeout(() => joinSuccessMsg.classList.add('hidden'), 5000);
+              scanContributorDevice(payload.name, data.node.ip);
+              setTimeout(() => dashboard.scrollIntoView({ behavior: 'smooth' }), 300);
+            }
+          } catch (err) {
+            alert('Error registering laptop node into cluster.');
+          }
+        });
+      }
+
+      // === AUTO-SCAN ON PAGE LOAD ===
+      // Wait for auto-connect from common.js, then scan this device
+      setTimeout(() => {
+        if (AppState.autoConnected && AppState.autoConnectIP) {
+          scanContributorDevice(AppState.autoConnectName, AppState.autoConnectIP);
+        } else {
+          // If not auto-connected yet, wait a bit more and scan self (localhost)
+          setTimeout(() => {
+            if (AppState.autoConnected && AppState.autoConnectIP) {
+              scanContributorDevice(AppState.autoConnectName, AppState.autoConnectIP);
+            } else {
+              // Scan the server's own IP
+              const serverIP = document.getElementById('host-ip')?.textContent || window.location.hostname;
+              if (serverIP && serverIP !== 'Scanning...') {
+                scanContributorDevice('This Device', serverIP);
+              }
+            }
+          }, 3000);
+        }
+      }, 2000);
+    });
+  </script>
+</body>
+</html>

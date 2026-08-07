@@ -5,6 +5,7 @@ const path = require('path');
 const cors = require('cors');
 const os = require('os');
 const fs = require('fs');
+const net = require('net');
 const { exec } = require('child_process');
 
 const app = express();
@@ -44,7 +45,9 @@ let realWifiDetails = {
   rxMbps: '573.5',
   txMbps: '573.5',
   signalPercent: '90%',
-  radioType: 'Wi-Fi 6'
+  radioType: 'Wi-Fi 6',
+  band: '5 GHz',
+  channel: '36'
 };
 
 const AVAILABLE_MODELS = [
@@ -61,11 +64,13 @@ function updateRealWifiDetails() {
   exec('netsh wlan show interfaces', (err, stdout) => {
     if (err || !stdout) return;
     
-    const ssidMatch = stdout.match(/SSID\s+:\s+(.+)/i);
+    const ssidMatch = stdout.match(/^\s+SSID\s+:\s+(.+)/im);
     const rxMatch = stdout.match(/Receive rate \(Mbps\)\s+:\s+(.+)/i);
     const txMatch = stdout.match(/Transmit rate \(Mbps\)\s+:\s+(.+)/i);
     const signalMatch = stdout.match(/Signal\s+:\s+(.+)/i);
     const radioMatch = stdout.match(/Radio type\s+:\s+(.+)/i);
+    const bandMatch = stdout.match(/Band\s+:\s+(.+)/i);
+    const channelMatch = stdout.match(/Channel\s+:\s+(\d+)/i);
 
     if (ssidMatch && ssidMatch[1]) realWifiDetails.ssid = ssidMatch[1].trim();
     if (rxMatch && rxMatch[1]) {
@@ -78,6 +83,8 @@ function updateRealWifiDetails() {
       const radio = radioMatch[1].trim();
       realWifiDetails.radioType = radio.includes('802.11ax') ? 'Wi-Fi 6' : radio;
     }
+    if (bandMatch && bandMatch[1]) realWifiDetails.band = bandMatch[1].trim();
+    if (channelMatch && channelMatch[1]) realWifiDetails.channel = channelMatch[1].trim();
   });
 }
 updateRealWifiDetails();
@@ -400,7 +407,107 @@ app.get('/api/cluster/metrics', (req, res) => {
   });
 });
 
-app.post('/api/cluster/join', (req, res) => {
+// ============================================================
+// DEVICE PORT SCANNER - Scans contributor devices for services
+// ============================================================
+function scanPort(ip, port, timeoutMs = 500) {
+  return new Promise((resolve) => {
+    const sock = new net.Socket();
+    let resolved = false;
+    sock.setTimeout(timeoutMs);
+    sock.on('connect', () => {
+      resolved = true;
+      sock.destroy();
+      resolve(true);
+    });
+    sock.on('timeout', () => { if (!resolved) { sock.destroy(); resolve(false); } });
+    sock.on('error', () => { if (!resolved) { sock.destroy(); resolve(false); } });
+    sock.connect(port, ip);
+  });
+}
+
+function pingDevice(ip) {
+  return new Promise((resolve) => {
+    const cmd = process.platform === 'win32' ? `ping -n 1 -w 1000 ${ip}` : `ping -c 1 -W 1 ${ip}`;
+    exec(cmd, (err, stdout) => {
+      if (err) return resolve({ reachable: false, ms: 0 });
+      const match = stdout.match(/time[=<](\d+)/i);
+      resolve({ reachable: true, ms: match ? parseInt(match[1]) : 1 });
+    });
+  });
+}
+
+const SCANNABLE_SERVICES = [
+  { name: 'Ollama (Local LLM)', port: 11434, icon: '🤖', description: 'Run AI models locally on GPU', installUrl: 'https://ollama.com/download', installCmd: 'winget install Ollama.Ollama', benefit: 'Your GPU can run AI models 5x faster than CPU!' },
+  { name: 'Node.js Server', port: 3000, icon: '🟢', description: 'Run campus backup server', installUrl: 'https://nodejs.org', installCmd: 'winget install OpenJS.NodeJS', benefit: 'Become a backup server node for 24/7 uptime' },
+  { name: 'Jupyter Notebook', port: 8888, icon: '📓', description: 'Shared GPU notebook for ML', installUrl: 'https://jupyter.org/install', installCmd: 'pip install jupyter', benefit: 'Share GPU-powered notebooks with classmates' },
+  { name: 'Gradio', port: 7860, icon: '🎨', description: 'Build AI web apps instantly', installUrl: 'https://gradio.app', installCmd: 'pip install gradio', benefit: 'Create AI demos in 5 lines of Python' },
+  { name: 'Streamlit', port: 8501, icon: '📊', description: 'Data science dashboards', installUrl: 'https://streamlit.io', installCmd: 'pip install streamlit', benefit: 'Build interactive ML dashboards' },
+  { name: 'Python API (Flask)', port: 5000, icon: '🐍', description: 'Python REST API server', installUrl: 'https://flask.palletsprojects.com', installCmd: 'pip install flask', benefit: 'Serve custom ML models via API' },
+  { name: 'Python API (FastAPI)', port: 8000, icon: '⚡', description: 'High-performance Python API', installUrl: 'https://fastapi.tiangolo.com', installCmd: 'pip install fastapi uvicorn', benefit: 'Async Python API for real-time AI' },
+  { name: 'SMB File Sharing', port: 445, icon: '📁', description: 'Windows file sharing enabled', installUrl: '', installCmd: '', benefit: 'Share datasets and models across campus' },
+  { name: 'NetBIOS', port: 139, icon: '🔗', description: 'Network discovery enabled', installUrl: '', installCmd: '', benefit: 'Device is discoverable on campus network' },
+  { name: 'Remote Desktop (RDP)', port: 3389, icon: '🖥️', description: 'Remote desktop access', installUrl: '', installCmd: '', benefit: 'Remote control for GPU compute tasks' },
+  { name: 'SSH Server', port: 22, icon: '🔐', description: 'Secure shell access', installUrl: 'https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse', installCmd: 'Add-WindowsCapability -Online -Name OpenSSH.Server', benefit: 'Remote terminal access for automation' }
+];
+
+async function scanDevicePorts(ip) {
+  const ping = await pingDevice(ip);
+  const detectedFeatures = [];
+  const missingFeatures = [];
+
+  const scanPromises = SCANNABLE_SERVICES.map(async (svc) => {
+    const isOpen = await scanPort(ip, svc.port, 600);
+    if (isOpen) {
+      detectedFeatures.push({ name: svc.name, port: svc.port, status: 'active', icon: svc.icon });
+    } else if (svc.installUrl) {
+      missingFeatures.push({ ...svc, status: 'not_found' });
+    }
+  });
+
+  await Promise.all(scanPromises);
+
+  // Sort: detected by port, missing by port
+  detectedFeatures.sort((a, b) => a.port - b.port);
+  missingFeatures.sort((a, b) => a.port - b.port);
+
+  return {
+    ip,
+    pingMs: ping.ms,
+    reachable: ping.reachable,
+    detectedFeatures,
+    missingFeatures,
+    scannedAt: new Date().toISOString()
+  };
+}
+
+// Scan device endpoint
+app.post('/api/cluster/scan-device', async (req, res) => {
+  const { ip } = req.body;
+  if (!ip) return res.status(400).json({ error: 'IP address required' });
+  try {
+    const results = await scanDevicePorts(ip);
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: 'Scan failed: ' + err.message });
+  }
+});
+
+// Get contributor details with scan results
+app.get('/api/cluster/contributor/:ip', async (req, res) => {
+  const ip = req.params.ip;
+  const node = registeredNodes.find(n => n.ip === ip);
+  if (!node) return res.status(404).json({ error: 'Contributor not found' });
+  try {
+    const scanResults = await scanDevicePorts(ip);
+    res.json({ ...node, scanResults });
+  } catch (err) {
+    res.json({ ...node, scanResults: null });
+  }
+});
+
+// Join cluster endpoint
+app.post('/api/cluster/join', async (req, res) => {
   const { name, type, ramGB, vramGB, userAgent } = req.body;
   const clientIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress.replace('::ffff:', '');
   
@@ -416,17 +523,29 @@ app.post('/api/cluster/join', (req, res) => {
     status: 'Online',
     role: 'Contributor Student Node',
     hasActiveLlm: false,
-    latencyMs: Math.floor(Math.random() * 3) + 2
+    latencyMs: Math.floor(Math.random() * 3) + 2,
+    scanResults: null
   };
 
   if (existingIdx >= 0) {
-    registeredNodes[existingIdx] = newNode;
+    registeredNodes[existingIdx] = { ...registeredNodes[existingIdx], ...newNode, id: registeredNodes[existingIdx].id };
   } else {
     registeredNodes.push(newNode);
   }
 
   saveRegisteredNodes();
   scanRealArpDevices();
+
+  // Trigger async background scan for the contributor
+  const scanIP = newNode.ip;
+  scanDevicePorts(scanIP).then(scanResults => {
+    const idx = registeredNodes.findIndex(n => n.ip === scanIP);
+    if (idx >= 0) {
+      registeredNodes[idx].scanResults = scanResults;
+      saveRegisteredNodes();
+    }
+  }).catch(() => {});
+
   res.json({ success: true, node: newNode, message: 'Laptop registered into campus cluster!' });
 });
 

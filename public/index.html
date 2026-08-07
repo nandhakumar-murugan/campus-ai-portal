@@ -3,19 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Campus AI Supercomputer & Developer Portal | KGiSL Network</title>
+  <title>AI Studio & Code Generator | Campus AI Supercomputer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-  <!-- Background Decorative Glows -->
   <div class="bg-glow bg-glow-1"></div>
   <div class="bg-glow bg-glow-2"></div>
 
-  <!-- Top App Navigation -->
   <header class="app-header">
     <div class="brand">
       <div class="logo-icon">⚡</div>
@@ -24,22 +21,19 @@
         <p class="brand-sub">Created by <strong>Nandhakumar Murugan</strong> • <code>kgisledu.com</code> Network</p>
       </div>
     </div>
-
-    <!-- Real-time Network Pill Indicators -->
     <div class="network-status-bar">
       <div class="status-pill wifi-pill">
         <span class="wifi-dot"></span>
         <span class="pill-label">Wi-Fi:</span>
         <strong id="wifi-name">Scanning...</strong>
-        <span class="speed-tag" id="wifi-speed">573.5 Mbps</span>
+        <span class="speed-tag" id="wifi-speed">-- Mbps</span>
+        <span class="signal-tag" id="wifi-signal">📶 --%</span>
       </div>
-
       <div class="status-pill ip-pill">
         <span class="pill-icon">🌐</span>
         <span class="pill-label">Host IP:</span>
-        <code id="host-ip">172.16.194.19</code>
+        <code id="host-ip">Scanning...</code>
       </div>
-
       <div class="status-pill nodes-pill">
         <span class="pill-icon">💻</span>
         <span class="pill-label">Active Nodes:</span>
@@ -48,32 +42,27 @@
     </div>
   </header>
 
-  <!-- Auto-Connect Banner -->
   <div id="auto-connect-banner" class="alert-box success-alert hidden" style="max-width: 1400px; margin: 1rem auto -0.5rem; text-align: center;">
-    🟢 <strong>Device Auto-Connected & Contributing!</strong> Your device is live in the cluster topology map.
+    🟢 <strong>Device Auto-Connected & Contributing!</strong>
   </div>
 
-  <!-- Navigation Tabs -->
   <nav class="nav-tabs-container">
-    <button class="nav-tab active" data-tab="ai-studio">
+    <a href="index.html" class="nav-link" data-page="index.html">
       <span class="tab-icon">💬</span> AI Studio & Code Generator
-    </button>
-    <button class="nav-tab" data-tab="cluster-monitor">
+    </a>
+    <a href="cluster.html" class="nav-link" data-page="cluster.html">
       <span class="tab-icon">⚡</span> Real-Time Cluster Monitor
-    </button>
-    <button class="nav-tab" data-tab="join-node">
+    </a>
+    <a href="join.html" class="nav-link" data-page="join.html">
       <span class="tab-icon">🤝</span> Join Compute Pool
-    </button>
-    <button class="nav-tab" data-tab="vscode-setup">
+    </a>
+    <a href="setup.html" class="nav-link" data-page="setup.html">
       <span class="tab-icon">💻</span> VS Code & Developer Setup
-    </button>
+    </a>
   </nav>
 
-  <!-- Main Content Views -->
   <main class="content-container">
-
-    <!-- TAB 1: AI STUDIO -->
-    <section id="ai-studio" class="tab-pane active">
+    <section id="ai-studio">
       <div class="studio-layout">
         
         <!-- Sidebar Controls -->
@@ -152,208 +141,137 @@
 
       </div>
     </section>
-
-    <!-- TAB 2: CLUSTER MONITOR -->
-    <section id="cluster-monitor" class="tab-pane">
-      <div class="cluster-grid">
-
-        <!-- Metrics Overview Cards -->
-        <div class="metric-card">
-          <div class="metric-icon">🔷</div>
-          <div class="metric-data">
-            <h2 id="total-nodes-val">Scanning...</h2>
-            <p>Real Active Subnet Devices</p>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-icon">🧠</div>
-          <div class="metric-data">
-            <h2 id="total-vram-val">Scanning...</h2>
-            <p>Real Available RAM Memory</p>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-icon">⚡</div>
-          <div class="metric-data">
-            <h2 id="total-ram-val">Scanning...</h2>
-            <p>Real Total Installed System RAM</p>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-icon">🎛️</div>
-          <div class="metric-data">
-            <h2 id="cpu-usage-val">Scanning...</h2>
-            <p>Real Host CPU Utilization</p>
-          </div>
-        </div>
-
-        <!-- Registered Contributor Students List Card -->
-        <div class="nodes-table-card grid-col-span-2" style="border: 1px solid rgba(0, 242, 254, 0.4); background: rgba(11, 15, 23, 0.85);">
-          <h3>⭐ Registered Contributor Students & Laptops (Hall of Fame)</h3>
-          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">Students who have registered their device name to contribute RAM/compute to the campus AI supercomputer.</p>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Contributor Student / Device Name</th>
-                <th>Hardware / Laptop Spec</th>
-                <th>Campus IP</th>
-                <th>RAM / VRAM</th>
-                <th>Contributor Role</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="registered-contributors-body">
-              <!-- Dynamically Populated -->
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Interactive Topology Canvas -->
-        <div class="topology-card grid-col-span-2">
-          <div class="card-header">
-            <h3>🌐 Real-Time Subnet Topology Map (Google Offline & Campus Nodes)</h3>
-            <span class="live-pulse">LIVE WEBSOCKET FEED</span>
-          </div>
-          <div class="canvas-container">
-            <canvas id="topology-canvas" width="800" height="320"></canvas>
-          </div>
-        </div>
-
-        <!-- Discovered ARP Network Devices Table -->
-        <div class="nodes-table-card grid-col-span-2">
-          <h3>📋 Live Discovered ARP Network Devices Table</h3>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Device Name</th>
-                <th>Hardware / Network Card</th>
-                <th>Campus IP</th>
-                <th>System Memory</th>
-                <th>Network Role</th>
-                <th>Ping Latency</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="nodes-table-body">
-              <!-- Dynamically Populated -->
-            </tbody>
-          </table>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- TAB 3: JOIN COMPUTE POOL -->
-    <section id="join-node" class="tab-pane">
-      <div class="form-container-card">
-        <div class="form-header">
-          <h2>🤝 Contribute Your Laptop to the Campus Supercomputer</h2>
-          <p>By connecting your laptop into the pool, you contribute idle RAM/VRAM to help run Google Gemma 2 and DeepSeek models for the entire campus community.</p>
-        </div>
-
-        <form id="join-node-form" class="join-form">
-          <div class="form-group">
-            <label for="node-name">Device Name / Student Identifier</label>
-            <input type="text" id="node-name" placeholder="e.g., Siva (Campus Contributor)" required>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="device-type">Device Hardware Type</label>
-              <select id="device-type" class="custom-select">
-                <option value="Dedicated Gaming Laptop (NVIDIA RTX)">NVIDIA RTX Gaming Laptop</option>
-                <option value="Apple Silicon (M1/M2/M3/M4)">Apple Silicon Mac (Unified RAM)</option>
-                <option value="Desktop Workstation">Desktop Workstation PC</option>
-                <option value="Standard Student Laptop" selected>Standard Intel/AMD Laptop</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="vram-gb">Contributed VRAM (GB)</label>
-              <select id="vram-gb" class="custom-select">
-                <option value="4">4 GB VRAM</option>
-                <option value="6">6 GB VRAM</option>
-                <option value="8" selected>8 GB VRAM</option>
-                <option value="12">12 GB VRAM</option>
-                <option value="16">16 GB VRAM</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="ram-gb">System RAM (GB)</label>
-              <select id="ram-gb" class="custom-select">
-                <option value="8">8 GB RAM</option>
-                <option value="16" selected>16 GB RAM</option>
-                <option value="32">32 GB RAM</option>
-                <option value="64">64 GB RAM</option>
-              </select>
-            </div>
-          </div>
-
-          <button type="submit" class="btn-primary btn-large">
-            <span>Register Laptop into Campus AI Cluster</span> 🚀
-          </button>
-        </form>
-
-        <div id="join-success-msg" class="alert-box success-alert hidden">
-          ✅ <strong>Registration Successful!</strong> Your laptop is now registered as an active worker node in the campus cluster topology.
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 4: VS CODE & DEVELOPER SETUP -->
-    <section id="vscode-setup" class="tab-pane">
-      <div class="setup-container">
-        <div class="setup-header">
-          <h2>💻 Free GitHub Copilot Alternative (Google Gemma Offline) inside VS Code</h2>
-          <p>Connect VS Code, Cursor, or python projects directly to your campus server running Google Gemma models offline.</p>
-        </div>
-
-        <div class="setup-steps-grid">
-
-          <!-- Step 1: VS Code Continue -->
-          <div class="setup-card">
-            <div class="step-num">1</div>
-            <h3>VS Code (Continue.dev Extension)</h3>
-            <p>1. Install <strong>Continue</strong> from VS Code Extensions.<br>
-               2. Open <code>~/.continue/config.json</code> and paste:</p>
-            <div class="code-block-wrapper">
-              <pre><code id="code-continue">Loading real IP config...</code></pre>
-              <button class="btn-copy" data-target="code-continue">Copy Config</button>
-            </div>
-          </div>
-
-          <!-- Step 2: Python Script SDK -->
-          <div class="setup-card">
-            <div class="step-num">2</div>
-            <h3>Python OpenAI SDK</h3>
-            <p>Use standard OpenAI library pointing to your campus server:</p>
-            <div class="code-block-wrapper">
-              <pre><code id="code-python">Loading real Python code...</code></pre>
-              <button class="btn-copy" data-target="code-python">Copy Python Code</button>
-            </div>
-          </div>
-
-          <!-- Step 3: cURL Command -->
-          <div class="setup-card">
-            <div class="step-num">3</div>
-            <h3>cURL Terminal Command</h3>
-            <p>Query directly from PowerShell or Terminal:</p>
-            <div class="code-block-wrapper">
-              <pre><code id="code-curl">Loading real cURL command...</code></pre>
-              <button class="btn-copy" data-target="code-curl">Copy cURL</button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
   </main>
 
-  <script src="app.js"></script>
+  <script src="common.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let selectedModel = 'gemma-2-2b';
+      const chatMessages = document.getElementById('chat-messages');
+      const chatForm = document.getElementById('chat-form');
+      const chatInput = document.getElementById('chat-input');
+      const modelSelect = document.getElementById('model-select');
+      const systemPrompt = document.getElementById('system-prompt');
+      const clearChatBtn = document.getElementById('clear-chat-btn');
+      const liveCpuElem = document.getElementById('live-cpu');
+      const sidebarRamElem = document.getElementById('sidebar-vram');
+
+      if (modelSelect) {
+        modelSelect.addEventListener('change', (e) => {
+          selectedModel = e.target.value;
+        });
+      }
+
+      document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('chip-prompt')) {
+          const promptText = e.target.getAttribute('data-prompt');
+          if (chatInput) {
+            chatInput.value = promptText;
+            chatInput.focus();
+          }
+        }
+      });
+
+      if (clearChatBtn) {
+        clearChatBtn.addEventListener('click', () => {
+          chatMessages.innerHTML = `
+            <div class="message assistant-msg">
+              <div class="msg-avatar">🔷</div>
+              <div class="msg-content">
+                <h3>Chat Session Cleared</h3>
+                <p>Ready for your next prompt on Google Gemma / Campus AI Supercomputer.</p>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      if (chatForm) {
+        chatForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const prompt = chatInput.value.trim();
+          if (!prompt) return;
+
+          appendMessage('user', prompt);
+          chatInput.value = '';
+
+          const assistantMsgDiv = appendMessage('assistant', `Evaluating prompt on ${selectedModel} engine...`);
+
+          try {
+            const response = await fetch('/v1/chat/completions', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                model: selectedModel,
+                messages: [
+                  { role: 'system', content: systemPrompt.value },
+                  { role: 'user', content: prompt }
+                ]
+              })
+            });
+
+            const data = await response.json();
+            const content = data.choices[0].message.content;
+            updateAssistantMessage(assistantMsgDiv, content);
+          } catch (err) {
+            updateAssistantMessage(assistantMsgDiv, '❌ Error connecting to Campus AI server. Please check your intranet Wi-Fi connection.');
+          }
+        });
+      }
+
+      function appendMessage(role, text) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${role === 'user' ? 'user-msg' : 'assistant-msg'}`;
+        const avatar = role === 'user' ? '👤' : '🔷';
+        msgDiv.innerHTML = `
+          <div class="msg-avatar">${avatar}</div>
+          <div class="msg-content">${formatMarkdown(text)}</div>
+        `;
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return msgDiv;
+      }
+
+      function updateAssistantMessage(msgDiv, text) {
+        const contentDiv = msgDiv.querySelector('.msg-content');
+        if (contentDiv) {
+          contentDiv.innerHTML = formatMarkdown(text);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+      }
+
+      function formatMarkdown(str) {
+        return str
+          .replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+            return `<div class="code-block-wrapper"><pre><code>${escapeHtml(code.trim())}</code></pre><button class="btn-copy" onclick="copySnippet(this)">Copy Code</button></div>`;
+          })
+          .replace(/`([^`]+)`/g, '<code>$1</code>')
+          .replace(/\n\n/g, '<br><br>');
+      }
+
+      function escapeHtml(text) {
+        return text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      window.copySnippet = function(btn) {
+        const code = btn.previousElementSibling.innerText;
+        navigator.clipboard.writeText(code);
+        btn.innerText = 'Copied! ✅';
+        setTimeout(() => btn.innerText = 'Copy Code', 2000);
+      };
+
+      window.addEventListener('clusterUpdate', (e) => {
+        const data = e.detail;
+        if (data && data.sys) {
+          if (liveCpuElem) liveCpuElem.innerText = `${data.sys.cpuUsagePercent}% (${data.sys.cpuCores} Cores)`;
+          if (sidebarRamElem) sidebarRamElem.innerText = `${data.sys.freeRAMGB} GB Free / ${data.sys.totalRAMGB} GB`;
+        }
+      });
+    });
+  </script>
 </body>
 </html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time Cluster Monitor | Campus AI Supercomputer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo-icon">⚡</div>
+      <div class="brand-text">
+        <h1>Campus AI <span class="badge-tag">Supercomputer</span></h1>
+        <p class="brand-sub">Created by <strong>Nandhakumar Murugan</strong> • <code>kgisledu.com</code> Network</p>
+      </div>
+    </div>
+    <div class="network-status-bar">
+      <div class="status-pill wifi-pill">
+        <span class="wifi-dot"></span>
+        <span class="pill-label">Wi-Fi:</span>
+        <strong id="wifi-name">Scanning...</strong>
+        <span class="speed-tag" id="wifi-speed">-- Mbps</span>
+        <span class="signal-tag" id="wifi-signal">📶 --%</span>
+      </div>
+      <div class="status-pill ip-pill">
+        <span class="pill-icon">🌐</span>
+        <span class="pill-label">Host IP:</span>
+        <code id="host-ip">Scanning...</code>
+      </div>
+      <div class="status-pill nodes-pill">
+        <span class="pill-icon">💻</span>
+        <span class="pill-label">Active Nodes:</span>
+        <strong id="active-nodes-count">Scanning...</strong>
+      </div>
+    </div>
+  </header>
+
+  <div id="auto-connect-banner" class="alert-box success-alert hidden" style="max-width: 1400px; margin: 1rem auto -0.5rem; text-align: center;">
+    🟢 <strong>Device Auto-Connected & Contributing!</strong>
+  </div>
+
+  <nav class="nav-tabs-container">
+    <a href="index.html" class="nav-link" data-page="index.html">
+      <span class="tab-icon">💬</span> AI Studio & Code Generator
+    </a>
+    <a href="cluster.html" class="nav-link" data-page="cluster.html">
+      <span class="tab-icon">⚡</span> Real-Time Cluster Monitor
+    </a>
+    <a href="join.html" class="nav-link" data-page="join.html">
+      <span class="tab-icon">🤝</span> Join Compute Pool
+    </a>
+    <a href="setup.html" class="nav-link" data-page="setup.html">
+      <span class="tab-icon">💻</span> VS Code & Developer Setup
+    </a>
+  </nav>
+
+  <main class="content-container">
+    <section id="cluster-monitor">
+      <div class="cluster-grid">
+
+        <!-- Metrics Overview Cards -->
+        <div class="metric-card">
+          <div class="metric-icon">🔷</div>
+          <div class="metric-data">
+            <h2 id="total-nodes-val">Scanning...</h2>
+            <p>Real Active Subnet Devices</p>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">🧠</div>
+          <div class="metric-data">
+            <h2 id="total-vram-val">Scanning...</h2>
+            <p>Real Available RAM Memory</p>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">⚡</div>
+          <div class="metric-data">
+            <h2 id="total-ram-val">Scanning...</h2>
+            <p>Real Total Installed System RAM</p>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">🎛️</div>
+          <div class="metric-data">
+            <h2 id="cpu-usage-val">Scanning...</h2>
+            <p>Real Host CPU Utilization</p>
+          </div>
+        </div>
+
+        <!-- Registered Contributor Students List Card -->
+        <div class="nodes-table-card grid-col-span-2" style="border: 1px solid rgba(0, 242, 254, 0.4); background: rgba(11, 15, 23, 0.85);">
+          <h3>⭐ Registered Contributor Students & Laptops (Hall of Fame)</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">Students who have registered their device name to contribute RAM/compute to the campus AI supercomputer.</p>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Contributor Student / Device Name</th>
+                <th>Hardware / Laptop Spec</th>
+                <th>Campus IP</th>
+                <th>RAM / VRAM</th>
+                <th>Contributor Role</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="registered-contributors-body">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Interactive Topology Canvas -->
+        <div class="topology-card grid-col-span-2">
+          <div class="card-header">
+            <h3>🌐 Real-Time Subnet Topology Map (Google Offline & Campus Nodes)</h3>
+            <span class="live-pulse">LIVE WEBSOCKET FEED</span>
+          </div>
+          <div class="canvas-container">
+            <canvas id="topology-canvas" width="800" height="320"></canvas>
+          </div>
+        </div>
+
+        <!-- Discovered ARP Network Devices Table -->
+        <div class="nodes-table-card grid-col-span-2">
+          <h3>📋 Live Discovered ARP Network Devices Table</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Device Name</th>
+                <th>Hardware / Network Card</th>
+                <th>Campus IP</th>
+                <th>System Memory</th>
+                <th>Network Role</th>
+                <th>Ping Latency</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="nodes-table-body">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <script src="common.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.getElementById('topology-canvas');
+      const ctx = canvas ? canvas.getContext('2d') : null;
+      let angle = 0;
+      let clusterState = { nodes: [], hostIP: '127.0.0.1' };
+
+      function resizeCanvas() {
+        if (!canvas) return;
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = 320;
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      function escapeHtml(text) {
+        if (!text) return '';
+        return text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function animateTopology() {
+        if (!canvas || !ctx) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = Math.min(centerX, centerY) - 70;
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
+        ctx.fillStyle = '#00F2FE';
+        ctx.fill();
+        ctx.shadowColor = '#00F2FE';
+        ctx.shadowBlur = 20;
+
+        ctx.fillStyle = '#0B0F17';
+        ctx.font = 'bold 11px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText('HOST PC', centerX, centerY - 2);
+        ctx.fillText(clusterState.hostIP, centerX, centerY + 10);
+
+        const realNodes = clusterState.nodes && clusterState.nodes.length > 0 ? clusterState.nodes : [{ name: 'Host', ip: clusterState.hostIP }];
+        const nodeCount = realNodes.length;
+
+        realNodes.forEach((node, i) => {
+          const nodeAngle = angle + (i * (Math.PI * 2 / nodeCount));
+          const nx = centerX + Math.cos(nodeAngle) * radius;
+          const ny = centerY + Math.sin(nodeAngle) * radius;
+
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.lineTo(nx, ny);
+          ctx.strokeStyle = 'rgba(0, 242, 254, 0.3)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          const pulseProgress = (Date.now() / 1200 + i * 0.5) % 1;
+          const px = centerX + (nx - centerX) * pulseProgress;
+          const py = centerY + (ny - centerY) * pulseProgress;
+
+          ctx.beginPath();
+          ctx.arc(px, py, 4, 0, Math.PI * 2);
+          ctx.fillStyle = '#9D4EDD';
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(nx, ny, 18, 0, Math.PI * 2);
+          ctx.fillStyle = '#1E293B';
+          ctx.strokeStyle = '#00F2FE';
+          ctx.lineWidth = 2;
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = '#F1F5F9';
+          ctx.font = '11px Fira Code';
+          ctx.fillText(node.ip || '', nx, ny + 32);
+        });
+
+        angle += 0.003;
+        requestAnimationFrame(animateTopology);
+      }
+      animateTopology();
+
+      window.addEventListener('clusterUpdate', (e) => {
+        const data = e.detail;
+        if (!data) return;
+        
+        clusterState.nodes = data.nodes || [];
+        clusterState.hostIP = data.hostIP || window.location.hostname;
+        
+        const totalNodesVal = document.getElementById('total-nodes-val');
+        if (totalNodesVal && data.totals) totalNodesVal.innerText = `${data.totals.activeCount} Subnet Nodes`;
+
+        const totalVramVal = document.getElementById('total-vram-val');
+        if (totalVramVal && data.sys) totalVramVal.innerText = `${data.sys.freeRAMGB} GB Free`;
+
+        const totalRamVal = document.getElementById('total-ram-val');
+        if (totalRamVal && data.sys) totalRamVal.innerText = `${data.sys.totalRAMGB} GB Total`;
+
+        const cpuUsageVal = document.getElementById('cpu-usage-val');
+        if (cpuUsageVal && data.sys) cpuUsageVal.innerText = `${data.sys.cpuUsagePercent}%`;
+
+        const regContributorsBody = document.getElementById('registered-contributors-body');
+        if (regContributorsBody) {
+          const contributors = (data.registeredContributors && data.registeredContributors.length > 0) ? data.registeredContributors : [
+            { name: 'Nandhakumar Murugan (Lead)', type: '12-Core Intel i5 Host', ip: clusterState.hostIP, ramGB: 16, vramGB: 8, role: 'Primary Lead Host', status: 'Online' }
+          ];
+
+          regContributorsBody.innerHTML = contributors.map(c => `
+            <tr style="background: rgba(0, 242, 254, 0.05);">
+              <td><strong style="color: #00F2FE;">⭐ ${escapeHtml(c.name)}</strong></td>
+              <td>${escapeHtml(c.type)}</td>
+              <td><code>${c.ip}</code></td>
+              <td>${c.ramGB || 16} GB RAM / ${c.vramGB || 4} GB VRAM</td>
+              <td><span class="badge-tag">${c.role || 'Contributor Node'}</span></td>
+              <td><span class="badge-success">Online</span></td>
+            </tr>
+          `).join('');
+        }
+
+        const nodesTableBody = document.getElementById('nodes-table-body');
+        if (nodesTableBody && data.nodes) {
+          nodesTableBody.innerHTML = data.nodes.map(n => `
+            <tr>
+              <td><strong>${escapeHtml(n.name)}</strong></td>
+              <td>${escapeHtml(n.type)}</td>
+              <td><code>${n.ip}</code></td>
+              <td>${n.ramGB || 16} GB RAM / ${n.vramGB || 4} GB VRAM</td>
+              <td><span class="badge-tag">${n.role}</span></td>
+              <td>~${n.latencyMs} ms</td>
+              <td><span class="badge-success">${n.status}</span></td>
+            </tr>
+          `).join('');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -73,9 +73,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
       if (data.success) {
         state.autoConnected = true;
+        state.autoConnectIP = data.node.ip;
+        state.autoConnectName = `${deviceName} (${detectedCores} Cores)`;
         if (autoConnectBanner) {
-          autoConnectBanner.innerHTML = `🟢 <strong>Device Auto-Connected & Contributing!</strong> Your IP (<code>${data.node.ip}</code>) is live in the cluster with ${detectedRam}GB RAM.`;
+          autoConnectBanner.innerHTML = `🟢 <strong>Device Auto-Connected & Contributing!</strong> Your IP (<code>${data.node.ip}</code>) is live in the cluster with ${detectedRam}GB RAM. <button class="btn-view-dashboard" onclick="document.querySelector('[data-tab=join-node]').click(); setTimeout(function(){ var d = document.getElementById('contributor-dashboard'); if(d) d.scrollIntoView({behavior:'smooth'}); }, 300);">📊 View My Dashboard</button>`;
           autoConnectBanner.classList.remove('hidden');
+        }
+        // Auto-trigger scan dashboard in Join tab
+        if (typeof scanContributorDevice === 'function') {
+          scanContributorDevice(state.autoConnectName, data.node.ip);
         }
       }
     } catch (err) {
@@ -230,6 +236,9 @@ document.addEventListener('DOMContentLoaded', () => {
           joinSuccessMsg.classList.remove('hidden');
           joinForm.reset();
           setTimeout(() => joinSuccessMsg.classList.add('hidden'), 5000);
+          
+          scanContributorDevice(payload.name, data.node.ip);
+          contributorDashboard.scrollIntoView({ behavior: 'smooth' });
         }
       } catch (err) {
         alert('Error registering laptop node into cluster.');
@@ -258,10 +267,28 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateRealtimeUI() {
     if (state.sys.wifi) {
       const wifiNameElem = document.getElementById('wifi-name');
-      if (wifiNameElem) wifiNameElem.innerText = state.sys.wifi.ssid || 'NMH-HOSTEL';
+      if (wifiNameElem) wifiNameElem.innerText = state.sys.wifi.ssid || 'Campus Wi-Fi';
 
       const wifiSpeedElem = document.getElementById('wifi-speed');
-      if (wifiSpeedElem) wifiSpeedElem.innerText = `${state.sys.wifi.speedMbps || '573.5'} Mbps`;
+      if (wifiSpeedElem) {
+        const rx = state.sys.wifi.rxMbps || state.sys.wifi.speedMbps || '--';
+        const tx = state.sys.wifi.txMbps || '--';
+        const band = state.sys.wifi.band || '';
+        const ch = state.sys.wifi.channel || '';
+        wifiSpeedElem.innerText = `↓${rx} / ↑${tx} Mbps ${band ? '• ' + band : ''}${ch ? ' CH' + ch : ''}`;
+      }
+
+      const wifiSignalElem = document.getElementById('wifi-signal');
+      if (wifiSignalElem) {
+        const sig = state.sys.wifi.signalPercent || '--%';
+        const sigNum = parseInt(sig) || 0;
+        let bars = '📶';
+        if (sigNum >= 80) bars = '📶';
+        else if (sigNum >= 50) bars = '📶';
+        else bars = '📡';
+        wifiSignalElem.innerText = `${bars} ${sig}`;
+        wifiSignalElem.style.color = sigNum >= 70 ? '#22C55E' : sigNum >= 40 ? '#F59E0B' : '#EF4444';
+      }
     }
 
     const hostIpElem = document.getElementById('host-ip');
@@ -440,6 +467,93 @@ print(response.choices[0].message.content)`;
   }
 
   animateTopology();
+
+  // ===== CONTRIBUTOR DASHBOARD SCAN =====
+  const contributorDashboard = document.getElementById('contributor-dashboard');
+  const activeFeaturesGrid = document.getElementById('active-features-grid');
+  const installGrid = document.getElementById('install-recommendations-grid');
+
+  async function scanContributorDevice(deviceName, deviceIP) {
+    if (!contributorDashboard) return;
+    
+    // Show dashboard
+    contributorDashboard.classList.remove('hidden');
+    document.getElementById('dash-device-name').textContent = deviceName;
+    document.getElementById('dash-device-ip').textContent = 'IP: ' + deviceIP;
+    document.getElementById('scan-status-text').textContent = 'Scanning your device ports & services...';
+    
+    // Animate progress bar
+    const progressEl = document.getElementById('scan-progress');
+    progressEl.style.width = '30%';
+    
+    try {
+      const res = await fetch('/api/cluster/scan-device', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ip: deviceIP })
+      });
+      
+      progressEl.style.width = '80%';
+      const scan = await res.json();
+      
+      // Update ping
+      document.getElementById('dash-ping').textContent = scan.pingMs + ' ms';
+      
+      // Render active features
+      if (scan.detectedFeatures && scan.detectedFeatures.length > 0) {
+        activeFeaturesGrid.innerHTML = scan.detectedFeatures.map(f => `
+          <div class="feature-card active">
+            <span class="feature-icon">${f.icon}</span>
+            <div class="feature-info">
+              <strong>${f.name}</strong>
+              <span class="feature-port">Port ${f.port}</span>
+            </div>
+            <span class="feature-status active">✅ Active</span>
+          </div>
+        `).join('');
+      } else {
+        activeFeaturesGrid.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">No active services detected yet. Install tools below to start contributing!</p>';
+      }
+      
+      // Render install recommendations
+      if (scan.missingFeatures && scan.missingFeatures.length > 0) {
+        installGrid.innerHTML = scan.missingFeatures.map(f => `
+          <div class="install-card">
+            <div class="install-header">
+              <span class="install-icon">${f.icon}</span>
+              <div>
+                <strong>${f.name}</strong>
+                <span class="install-port">Port ${f.port}</span>
+              </div>
+            </div>
+            <p class="install-desc">${f.description}</p>
+            <p class="install-benefit">💡 ${f.benefit}</p>
+            <div class="install-actions">
+              <a href="${f.installUrl}" target="_blank" class="install-btn">📥 Download</a>
+              <div class="cmd-copy-btn" onclick="copyCmd(this, '${f.installCmd}')">
+                <code>${f.installCmd}</code>
+                <span class="copy-icon">📋</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      progressEl.style.width = '100%';
+      document.getElementById('scan-status-text').textContent = '✅ Scan complete! ' + scan.detectedFeatures.length + ' active services, ' + scan.missingFeatures.length + ' available to install';
+      
+    } catch (err) {
+      progressEl.style.width = '100%';
+      document.getElementById('scan-status-text').textContent = '⚠️ Scan timed out. Some features may not be detected.';
+    }
+  }
+
+  // Add copy command function  
+  window.copyCmd = function(el, cmd) {
+    navigator.clipboard.writeText(cmd);
+    el.querySelector('.copy-icon').textContent = '✅';
+    setTimeout(() => el.querySelector('.copy-icon').textContent = '📋', 2000);
+  };
 });
 
 window.copySnippet = function(btn) {
