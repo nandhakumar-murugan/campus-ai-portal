@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "Campus AI Supercomputer & Developer Portal for College Intranet Network",
   "main": "server.js",
+  "author": "Nandhakumar Murugan (KGiSL Educational Institutions)",
+  "homepage": "https://github.com/nandhakumar-murugan/campus-ai-portal",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"

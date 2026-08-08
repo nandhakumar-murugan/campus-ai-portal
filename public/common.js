@@ -116,8 +116,13 @@ async function autoConnectVisitingDevice() {
 }
 setTimeout(autoConnectVisitingDevice, 1000);
 
-// Highlight active nav link
+// Highlight active nav link & handle VS Code mode
 document.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('mode') === 'vscode' || window.name === 'vscode-frame') {
+    document.body.classList.add('vscode-mode');
+  }
+
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';
   document.querySelectorAll('.nav-link').forEach(link => {
     const href = link.getAttribute('href');

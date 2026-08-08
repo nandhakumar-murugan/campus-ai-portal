@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Developer Documentation | Campus AI Supercomputer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .docs-container {
+      max-width: 1300px;
+      margin: 1.5rem auto;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 900px) {
+      .docs-container { grid-template-columns: 1fr; }
+    }
+
+    /* Sidebar Navigation */
+    .docs-sidebar {
+      background: rgba(11, 15, 23, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 242, 254, 0.2);
+      border-radius: 14px;
+      padding: 1.2rem;
+      position: sticky;
+      top: 1.5rem;
+      height: fit-content;
+    }
+    .docs-sidebar h3 {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #00F2FE;
+      margin-bottom: 0.8rem;
+    }
+    .docs-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .docs-menu a {
+      color: #94A3B8;
+      text-decoration: none;
+      font-size: 0.88rem;
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .docs-menu a:hover, .docs-menu a.active {
+      background: rgba(0, 242, 254, 0.1);
+      color: #F1F5F9;
+    }
+
+    /* Main Doc Body */
+    .docs-body {
+      background: rgba(11, 15, 23, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 242, 254, 0.2);
+      border-radius: 14px;
+      padding: 2rem;
+    }
+    .doc-section {
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .doc-section:last-child { border-bottom: none; }
+
+    .doc-title {
+      font-size: 1.6rem;
+      background: linear-gradient(135deg, #00F2FE, #9D4EDD);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+    .doc-sub { color: #94A3B8; font-size: 0.9rem; margin-bottom: 1.5rem; }
+
+    .endpoint-badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-right: 0.5rem;
+    }
+    .badge-post { background: rgba(34, 197, 94, 0.2); color: #4ADE80; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .badge-get { background: rgba(59, 130, 246, 0.2); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .badge-ws { background: rgba(157, 78, 221, 0.2); color: #C77DFF; border: 1px solid rgba(157, 78, 221, 0.4); }
+
+    .tech-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    .tech-table th, .tech-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .tech-table th {
+      background: rgba(255,255,255,0.03);
+      color: #00F2FE;
+      font-size: 0.85rem;
+    }
+    .tech-table td { font-size: 0.85rem; color: #CBD5E1; }
+
+    .code-box {
+      background: #0D1117;
+      border: 1px solid rgba(0, 242, 254, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 0.8rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: #00F2FE;
+      overflow-x: auto;
+    }
+
+    .doc-tip {
+      background: rgba(0, 242, 254, 0.06);
+      border-left: 3px solid #00F2FE;
+      padding: 0.8rem 1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 0.8rem 0;
+      font-size: 0.85rem;
+      color: #94A3B8;
+    }
+    .doc-tip strong { color: #00F2FE; }
+
+    .doc-warning {
+      background: rgba(251, 191, 36, 0.08);
+      border-left: 3px solid #FBBF24;
+      padding: 0.8rem 1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 0.8rem 0;
+      font-size: 0.85rem;
+      color: #94A3B8;
+    }
+    .doc-warning strong { color: #FBBF24; }
+  </style>
+</head>
+<body>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo-icon">⚡</div>
+      <div class="brand-text">
+        <h1>Campus AI <span class="badge-tag">Supercomputer</span></h1>
+        <p class="brand-sub">Created by <strong>Nandhakumar M.</strong> • KGiSL Institute of Technology (KGiSL ITech)</p>
+      </div>
+    </div>
+    <div class="network-status-bar">
+      <div class="status-pill wifi-pill">
+        <span class="wifi-dot"></span>
+        <span class="pill-label">Wi-Fi:</span>
+        <strong id="wifi-name">Scanning...</strong>
+        <span class="speed-tag" id="wifi-speed">-- Mbps</span>
+        <span class="signal-tag" id="wifi-signal">📶 --%</span>
+      </div>
+      <div class="status-pill ip-pill">
+        <span class="pill-icon">🌐</span>
+        <span class="pill-label">Host IP:</span>
+        <code id="host-ip">Scanning...</code>
+      </div>
+      <div class="status-pill nodes-pill">
+        <span class="pill-icon">💻</span>
+        <span class="pill-label">Active Nodes:</span>
+        <strong id="active-nodes-count">Scanning...</strong>
+      </div>
+    </div>
+  </header>
+
+  <nav class="nav-tabs-container">
+    <a href="index.html" class="nav-link"><span class="tab-icon">💬</span> AI Studio & Code Generator</a>
+    <a href="cluster.html" class="nav-link"><span class="tab-icon">⚡</span> Real-Time Cluster Monitor</a>
+    <a href="join.html" class="nav-link"><span class="tab-icon">🤝</span> Join Compute Pool</a>
+    <a href="setup.html" class="nav-link"><span class="tab-icon">💻</span> VS Code Setup</a>
+    <a href="docs.html" class="nav-link active"><span class="tab-icon">📚</span> Developer Docs</a>
+  </nav>
+
+  <main class="docs-container">
+    <!-- Sidebar Menu -->
+    <aside class="docs-sidebar">
+      <h3>📚 Documentation Navigation</h3>
+      <div class="docs-menu">
+        <a href="#overview" class="active">1. Architecture Overview</a>
+        <a href="#tech-stack">2. Tech Stack & Dependencies</a>
+        <a href="#api-reference">3. REST API Reference</a>
+        <a href="#websocket">4. WebSocket Protocol</a>
+        <a href="#data-structures">5. Data Structures & State</a>
+        <a href="#core-functions">6. Core Server Functions</a>
+        <a href="#discovery">7. Subnet & ARP Discovery</a>
+        <a href="#port-scanner">8. Port Scanner Engine</a>
+        <a href="#llm-pipeline">9. LLM Inference Pipeline</a>
+        <a href="#pooled-math">10. Pooled Compute Math</a>
+        <a href="#live-usage">11. Live Usage Monitoring</a>
+        <a href="#frontend-architecture">12. Frontend Architecture</a>
+        <a href="#contributor-agent">13. Contributor Agent</a>
+        <a href="#vscode-integration">14. VS Code & Copilot Setup</a>
+        <a href="#ai-models">15. AI Models Reference</a>
+        <a href="#student-benefits">16. Student Benefits & Value</a>
+        <a href="#tool-comparison">17. Tool Comparison Matrix</a>
+        <a href="#safety-privacy">18. Safety & Privacy Spec</a>
+        <a href="#author-profile">19. Author Profile & Bio</a>
+      </div>
+    </aside>
+
+    <!-- Main Documentation Body -->
+    <div class="docs-body">
+
+      <!-- Section 1 -->
+      <section id="overview" class="doc-section">
+        <h2 class="doc-title">1. Architecture Overview</h2>
+        <p class="doc-sub">High-Performance Campus Intranet Mesh AI Supercomputer</p>
+        <p style="color: #CBD5E1; font-size: 0.9rem; line-height: 1.6;">
+          The <strong>Campus AI Supercomputer</strong> aggregates idle RAM, VRAM, and CPU cores from student laptops across the campus Wi-Fi network to run 100% private, offline neural network models. Features a Node.js primary server handling telemetry and real-time P2P coordination, failing over across nodes to maintain uptime.
+        </p>
+      </section>
+
+      <!-- Section 2 -->
+      <section id="tech-stack" class="doc-section">
+        <h2 class="doc-title">2. Tech Stack & Dependencies</h2>
+        <p class="doc-sub">Core systems powering the supercomputer</p>
+        <table class="tech-table">
+          <thead>
+            <tr><th>Component</th><th>Technology</th><th>Role</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Backend Server</td><td>Node.js Express (server.js, ~800 loc)</td><td>Hosts port 3000 API, orchestrates the cluster, handles HTTP & WebSockets.</td></tr>
+            <tr><td>Neural Engine</td><td>Python (llm_server.py) + PyTorch</td><td>Local LLM via HuggingFace or Ollama on port 11434.</td></tr>
+            <tr><td>Real-Time Comm</td><td>WebSocket API</td><td>Broadcasts telemetry every 3s to all frontend clients.</td></tr>
+            <tr><td>Network Discovery</td><td>Windows `arp -a` & `netsh wlan`</td><td>Subnet scanning and active node identification.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section 3 -->
+      <section id="api-reference" class="doc-section">
+        <h2 class="doc-title">3. REST API Reference</h2>
+        <p class="doc-sub">ALL endpoints for cluster orchestration and inference</p>
+        
+        <div style="margin-bottom: 1.5rem;">
+          <h4><span class="endpoint-badge badge-get">GET</span> <code>/api/cluster/metrics</code></h4>
+          <p style="color: #94A3B8; font-size: 0.85rem; margin-top: 0.3rem;">Returns full cluster telemetry including system stats, models, nodes, and totals.</p>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <h4><span class="endpoint-badge badge-post">POST</span> <code>/api/cluster/scan-device</code></h4>
+          <p style="color: #94A3B8; font-size: 0.85rem; margin-top: 0.3rem;">Port scan a target device.</p>
+          <div class="code-box">Request: { "ip": "172.16.x.x" }
+Response: { "pingMs": 4, "reachable": true, "detectedFeatures": [...], "missingFeatures": [...] }</div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <h4><span class="endpoint-badge badge-get">GET</span> <code>/api/cluster/contributor/:ip</code></h4>
+          <p style="color: #94A3B8; font-size: 0.85rem; margin-top: 0.3rem;">Get contributor details + recent port scan report for a specific IP.</p>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <h4><span class="endpoint-badge badge-post">POST</span> <code>/api/cluster/join</code></h4>
+          <p style="color: #94A3B8; font-size: 0.85rem; margin-top: 0.3rem;">Register a new laptop into the compute pool.</p>
+          <div class="code-box">Request: { "name": "Laptop-1", "type": "Student", "ramGB": 16, "vramGB": 4, "userAgent": "..." }
+Response: { "success": true, "node": { ... } }</div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <h4><span class="endpoint-badge badge-post">POST</span> <code>/api/report-usage</code></h4>
+          <p style="color: #94A3B8; font-size: 0.85rem; margin-top: 0.3rem;">Contributor heartbeat endpoint.</p>
+          <div class="code-box">Request: { "cpuPercent": 12, "usedRAMGB": 4.5, "totalRAMGB": 16, "ramUsagePercent": 28, "hostname": "..." }</div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <h4><span class="endpoint-badge badge-get">GET</span> <code>/v1/models</code></h4>
+          <p style="color: #94A3B8; font-size: 0.85rem; margin-top: 0.3rem;">List OpenAI-compatible models available for inference.</p>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <h4><span class="endpoint-badge badge-post">POST</span> <code>/v1/chat/completions</code></h4>
+          <p style="color: #94A3B8; font-size: 0.85rem; margin-top: 0.3rem;">OpenAI standard chat completions. Triggers primary-to-failover node delegation.</p>
+          <div class="code-box">Request: { "model": "gemma-2-2b", "messages": [...] }
+Response: { "choices": [...], "usage": {...} }</div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <h4><span class="endpoint-badge badge-post">POST</span> <code>/api/generate</code></h4>
+          <p style="color: #94A3B8; font-size: 0.85rem; margin-top: 0.3rem;">Ollama-compatible endpoint for prompt generation.</p>
+          <div class="code-box">Request: { "prompt": "Hello", "model": "qwen-2.5-coder" }
+Response: { "model": "...", "response": "...", "done": true }</div>
+        </div>
+      </section>
+
+      <!-- Section 4 -->
+      <section id="websocket" class="doc-section">
+        <h2 class="doc-title">4. WebSocket Protocol</h2>
+        <p class="doc-sub">Real-time bi-directional telemetry</p>
+        <div class="doc-tip"><strong>Note:</strong> WebSocket broadcasts occur every 3 seconds to ensure low network overhead while maintaining live stats.</div>
+        <div style="margin-bottom: 1.5rem;">
+          <h4><span class="endpoint-badge badge-ws">WS</span> <code>ws://host:3000</code></h4>
+        </div>
+        <div class="code-box">{
+  "type": "REALTIME_UPDATE",
+  "hostIP": "172.16.110.12",
+  "sys": { "hostname": "Server-1", "cpuModel": "...", "cpuCores": 8, "cpuUsagePercent": 14, "totalRAMGB": 32, "freeRAMGB": 16, "usedRAMGB": 16, "ramUsagePercent": 50, "wifi": {...} },
+  "nodes": [...],
+  "registeredContributors": [{ /* contributorFields */, "liveUsage": { "cpuPercent": 10, "usedRAMGB": 2, "ramUsagePercent": 25, "isLive": true } }],
+  "totals": { "activeCount": 5, "totalContributorsCount": 10, "pooledContributorRAM": 128, "pooledContributorVRAM": 32, "totalContributorRAM": 256, "totalUsedRAM": 64 },
+  "models": [...],
+  "totalRequestsProcessed": 1024
+}</div>
+      </section>
+
+      <!-- Section 5 -->
+      <section id="data-structures" class="doc-section">
+        <h2 class="doc-title">5. Data Structures & State</h2>
+        <p class="doc-sub">In-memory caching and JSON structures</p>
+        <ul style="color: #CBD5E1; font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem;">
+          <li><code>registeredNodes</code>: Array loaded from registered_contributors.json</li>
+          <li><code>liveUsageMap</code>: Map storing heartbeats: Map&lt;ip, {cpuPercent, usedRAMGB, totalRAMGB, ramUsagePercent, hostname, lastReportedAt}&gt;</li>
+          <li><code>realDiscoveredNodes</code>: Combined dynamic map of Host + Registered + ARP nodes</li>
+          <li><code>lastCpuMeasure</code>: Retains CPU ticks for precise load calculations</li>
+          <li><code>realWifiDetails</code>: { ssid, speedMbps, rxMbps, txMbps, signalPercent, radioType, band, channel }</li>
+        </ul>
+        <h4 style="color:#00F2FE; font-size:0.9rem; margin-top: 1rem;">Contributor Data Schema</h4>
+        <div class="code-box">{
+  "id": "node-1786008491653",
+  "name": "Anush",
+  "ip": "172.16.206.246",
+  "type": "Standard Student Laptop",
+  "ramGB": 8,
+  "vramGB": 4,
+  "status": "Online",
+  "role": "Contributor Student Node",
+  "hasActiveLlm": false,
+  "latencyMs": 4,
+  "scanResults": { "ip": "...", "pingMs": 4, "reachable": true, "detectedFeatures": [], "missingFeatures": [] }
+}</div>
+      </section>
+
+      <!-- Section 6 -->
+      <section id="core-functions" class="doc-section">
+        <h2 class="doc-title">6. Core Server Functions</h2>
+        <p class="doc-sub">Internal logic inside <code>server.js</code></p>
+        <table class="tech-table">
+          <tbody>
+            <tr><td><code>getRealSystemSpecs()</code></td><td>Fetches host RAM, CPU load, uptime, and interfaces.</td></tr>
+            <tr><td><code>getRealCpuPercent()</code></td><td>Computes instantaneous CPU utilization from differential OS tick counts.</td></tr>
+            <tr><td><code>getPrimaryHostIP()</code></td><td>Selects best IP (prioritizes Wi-Fi > campus subnet > eth0).</td></tr>
+            <tr><td><code>scanRealArpDevices()</code></td><td>Parses <code>arp -a</code> to build subnet map every 3s.</td></tr>
+            <tr><td><code>broadcastRealtimeState()</code></td><td>Pushes metrics to clients over WebSocket.</td></tr>
+            <tr><td><code>processRealPrompt()</code></td><td>Handles failover sequence: Primary Node &rarr; P2P Node &rarr; Fallback Rules.</td></tr>
+            <tr><td><code>generateIntelligentAnswer()</code></td><td>Fires internal rule-engine if all LLMs are down.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section 7 -->
+      <section id="discovery" class="doc-section">
+        <h2 class="doc-title">7. Subnet & ARP Discovery</h2>
+        <p class="doc-sub">Dynamic peer identification</p>
+        <p style="color: #CBD5E1; font-size: 0.9rem; line-height: 1.6;">
+          Node.js spawns a child process running <code>arp -a</code> every 3 seconds to parse the local routing table. Recognized IPs are validated against <code>registeredNodes</code> to update connectivity status dynamically.
+        </p>
+      </section>
+
+      <!-- Section 8 -->
+      <section id="port-scanner" class="doc-section">
+        <h2 class="doc-title">8. Port Scanner Engine</h2>
+        <p class="doc-sub">Probing device capabilities</p>
+        <div class="doc-warning"><strong>Security:</strong> The port scanner relies on internal intranet traffic. Be mindful of aggressive sweeping.</div>
+        <p style="color: #CBD5E1; font-size: 0.9rem; line-height: 1.6;">
+          <code>scanDevicePorts(ip)</code> loops over predefined TCP ports using non-blocking sockets.
+          Includes: 11434 (Ollama), 3000 (Node Server), 8888 (Jupyter), 7860 (Gradio), 8501 (Streamlit), 5000 (Flask), 8000 (FastAPI), 445 (SMB), 139 (NetBIOS), 3389 (RDP), 22 (SSH).
+        </p>
+      </section>
+
+      <!-- Section 9 -->
+      <section id="llm-pipeline" class="doc-section">
+        <h2 class="doc-title">9. LLM Inference Pipeline</h2>
+        <p class="doc-sub">Fail-safe prompt handling</p>
+        <p style="color: #CBD5E1; font-size: 0.9rem; line-height: 1.6;">
+          Inbound requests to <code>/v1/chat/completions</code> are routed through <code>processRealPrompt()</code>. It attempts inference on localhost (11434). If unavailable, it delegates to known peer nodes. Finally, it falls back to <code>generateIntelligentAnswer()</code>.
+        </p>
+      </section>
+
+      <!-- Section 10 -->
+      <section id="pooled-math" class="doc-section">
+        <h2 class="doc-title">10. Pooled Compute Math</h2>
+        <p class="doc-sub">Aggregate metric calculation</p>
+        <div class="code-box">const onlineContributors = registeredNodes.filter(n => n.status === 'Online');
+const pooledRAM = onlineContributors.reduce((sum, n) => sum + n.ramGB, 0);
+const pooledVRAM = onlineContributors.reduce((sum, n) => sum + n.vramGB, 0);</div>
+      </section>
+
+      <!-- Section 11 -->
+      <section id="live-usage" class="doc-section">
+        <h2 class="doc-title">11. Live Usage Monitoring</h2>
+        <p class="doc-sub">Agent reporting mechanism</p>
+        <p style="color: #CBD5E1; font-size: 0.9rem; line-height: 1.6;">
+          The contributor agent (via <code>contributor-agent.html</code> or headless script) routinely POSTs to <code>/api/report-usage</code> to populate <code>liveUsageMap</code>. Dead nodes (no report for >15s) are purged.
+        </p>
+      </section>
+
+      <!-- Section 12 -->
+      <section id="frontend-architecture" class="doc-section">
+        <h2 class="doc-title">12. Frontend Architecture</h2>
+        <p class="doc-sub">Client-side rendering logic</p>
+        <p style="color: #CBD5E1; font-size: 0.9rem; line-height: 1.6;">
+          <strong>common.js</strong> manages `AppState`, WebSocket connections, and UI rendering (e.g., active tabs). <strong>app.js</strong> contains legacy monolithic rendering. <strong>styles.css</strong> is an 1129-line file applying deep dark-glassmorphism themes across all 6 main pages.
+        </p>
+      </section>
+
+      <!-- Section 13 -->
+      <section id="contributor-agent" class="doc-section">
+        <h2 class="doc-title">13. Contributor Agent</h2>
+        <p class="doc-sub">Opt-in worker runtime</p>
+        <p style="color: #CBD5E1; font-size: 0.9rem; line-height: 1.6;">
+          Located at <code>contributor-agent.html</code>, this client provides a visual dashboard for users contributing hardware, managing active P2P tunnels, and visualizing local usage.
+        </p>
+      </section>
+
+      <!-- Section 14 -->
+      <section id="vscode-integration" class="doc-section">
+        <h2 class="doc-title">14. VS Code & Copilot Setup</h2>
+        <p class="doc-sub">Editor configurations</p>
+        <div class="code-box">{
+  "models": [
+    {
+      "title": "Campus AI Supercomputer Copilot",
+      "provider": "openai",
+      "model": "qwen2.5-coder",
+      "apiBase": "http://172.16.110.12:3000/v1"
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "Campus AutoComplete",
+    "provider": "openai",
+    "model": "qwen2.5-coder",
+    "apiBase": "http://172.16.110.12:3000/v1"
+  }
+}</div>
+      </section>
+
+      <!-- Section 15 -->
+      <section id="ai-models" class="doc-section">
+        <h2 class="doc-title">15. AI Models Reference</h2>
+        <p class="doc-sub">Available runtime models</p>
+        <ul style="color: #CBD5E1; font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem;">
+          <li><strong>gemma-2-2b</strong> - Google Gemma 2 (2B) - Fast On-Device</li>
+          <li><strong>gemma-2-9b</strong> - Google Gemma 2 (9B) - High Accuracy</li>
+          <li><strong>gemini-nano</strong> - Google Gemini Nano - Ultra-Low Latency</li>
+          <li><strong>deepseek-r1</strong> - DeepSeek-R1 (32B) - Deep Reasoning</li>
+          <li><strong>deepseek-coder</strong> - DeepSeek Coder V2 (16B) - Full-Stack Copilot</li>
+          <li><strong>llama-3.2-3b</strong> - Llama 3.2 (3B) - Ultra-Fast Chat</li>
+          <li><strong>qwen-2.5-coder</strong> - Qwen 2.5 Coder (7B) - Python/C++/Java</li>
+        </ul>
+      </section>
+
+      <!-- Section 16 -->
+      <section id="student-benefits" class="doc-section">
+        <h2 class="doc-title">16. Student Benefits & Value Analysis</h2>
+        <p class="doc-sub">How this system empowers campus developers</p>
+        <div class="doc-tip"><strong>Core Value:</strong> Provides 100% free, unlimited local AI compute without requiring credit cards, paid API keys, or external cloud subscriptions.</div>
+        <ul style="color: #CBD5E1; font-size: 0.9rem; line-height: 1.6;">
+          <li><strong>Zero Cost Barrier:</strong> Eliminates subscription fees like ₹800/month for GitHub Copilot or ₹1600/month for ChatGPT Plus.</li>
+          <li><strong>Firewall Independence:</strong> Bypasses restrictive campus network rules by serving models over local intranet IPs (<code>172.16.x.x</code>).</li>
+          <li><strong>Zero Network Latency Lag:</strong> Operates at gigabit Wi-Fi speeds (573+ Mbps) without external internet bottlenecks.</li>
+          <li><strong>Resource Pooling:</strong> Aggregates idle student laptop RAM/VRAM into a unified campus supercomputing cluster.</li>
+        </ul>
+      </section>
+
+      <!-- Section 17 -->
+      <section id="tool-comparison" class="doc-section">
+        <h2 class="doc-title">17. Tool Comparison Matrix</h2>
+        <p class="doc-sub">Campus AI vs Commercial Solutions</p>
+        <table class="tech-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>GitHub Copilot</th>
+              <th>ChatGPT / Claude</th>
+              <th>Solo Ollama</th>
+              <th>Campus AI Supercomputer</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Pricing</strong></td>
+              <td>₹800 / mo</td>
+              <td>₹1600 / mo</td>
+              <td>Free</td>
+              <td><span style="color: #4ADE80; font-weight: 600;">FREE</span></td>
+            </tr>
+            <tr>
+              <td><strong>Internet Needed</strong></td>
+              <td>Yes</td>
+              <td>Yes</td>
+              <td>No</td>
+              <td><span style="color: #4ADE80; font-weight: 600;">100% Offline</span></td>
+            </tr>
+            <tr>
+              <td><strong>Firewall Proof</strong></td>
+              <td>No</td>
+              <td>No</td>
+              <td>Yes</td>
+              <td><span style="color: #4ADE80; font-weight: 600;">Yes (Intranet IP)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Data Privacy</strong></td>
+              <td>Cloud Server</td>
+              <td>Cloud Server</td>
+              <td>Local Device</td>
+              <td><span style="color: #4ADE80; font-weight: 600;">Campus Mesh Only</span></td>
+            </tr>
+            <tr>
+              <td><strong>Zero Setup UI</strong></td>
+              <td>No (Extension)</td>
+              <td>Yes (Web)</td>
+              <td>No (CLI Only)</td>
+              <td><span style="color: #4ADE80; font-weight: 600;">Yes (Browser Dashboard)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Pooled Compute</strong></td>
+              <td>No</td>
+              <td>No</td>
+              <td>No</td>
+              <td><span style="color: #4ADE80; font-weight: 600;">Multi-Laptop RAM Pool</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section 18 -->
+      <section id="safety-privacy" class="doc-section">
+        <h2 class="doc-title">18. Safety & Privacy Specification</h2>
+        <p class="doc-sub">Security posture and data boundaries</p>
+        <div class="doc-warning"><strong>Privacy Rule:</strong> Student code, prompt completions, and conversation histories are NEVER logged to disk or transmitted outside the campus network.</div>
+        <table class="tech-table">
+          <thead>
+            <tr>
+              <th>Data Element</th>
+              <th>Processing Location</th>
+              <th>Persistence</th>
+              <th>Security Level</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>User Chat Prompts</td>
+              <td>RAM Only (Host Node)</td>
+              <td>Ephemeral (Discarded on response)</td>
+              <td><span style="color: #4ADE80;">Zero Risk</span></td>
+            </tr>
+            <tr>
+              <td>Source Code Snippets</td>
+              <td>RAM Only (Host Node)</td>
+              <td>Ephemeral (Discarded on response)</td>
+              <td><span style="color: #4ADE80;">Zero Risk</span></td>
+            </tr>
+            <tr>
+              <td>Device Telemetry (CPU/RAM)</td>
+              <td>In-Memory Map (`liveUsageMap`)</td>
+              <td>Volatile (Purged after 30s timeout)</td>
+              <td><span style="color: #60A5FA;">Safe Diagnostics</span></td>
+            </tr>
+            <tr>
+              <td>Node Registrations</td>
+              <td>`registered_contributors.json`</td>
+              <td>Saved locally on host machine</td>
+              <td><span style="color: #60A5FA;">Local Only</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section 19 -->
+      <section id="author-profile" class="doc-section">
+        <h2 class="doc-title">19. Executive Author Profile & Bio</h2>
+        <p class="doc-sub">Developer background, technical domain matrix, leadership roles, and strategic portfolio</p>
+        
+        <div class="doc-tip" style="margin-bottom: 1.5rem;">
+          <strong style="color: #00F2FE; font-size: 1rem;">Nandhakumar M.</strong><br>
+          <span style="color: #CBD5E1;">Head of KGiSL Campus Google Community • Google Student Ambassador</span><br>
+          <span style="color: #94A3B8; font-size: 0.85rem;">B.E. Computer Science & Engineering (Cyber Security) — 3rd Year (V Sem) • KGiSL Institute of Technology (KGiSL ITech)</span>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <h4>🎯 Professional Profile & Career Objective</h4>
+          <p style="color: #CBD5E1; font-size: 0.88rem; line-height: 1.6; margin-top: 0.3rem;">
+            Passionate Computer Science and Cyber Security engineer specializing in <strong>Artificial Intelligence, Generative AI, Cloud Infrastructure, and Digital Safety Systems</strong>. As <strong>Head of KGiSL Campus Google Community</strong> and <strong>Google Student Ambassador</strong>, actively leading technical workshops, open-source initiatives, and on-campus developer ecosystems. Seeking opportunities to design scalable, secure, and high-performance AI solutions that solve real-world industry and educational challenges.
+          </p>
+        </div>
+
+        <h4 style="color: #00F2FE; margin-top: 1.5rem;">🌐 Core Technical Domain Matrix</h4>
+        <table class="tech-table" style="margin-bottom: 1.5rem;">
+          <thead>
+            <tr><th>Technical Domain</th><th>Engineering Competencies & Tooling</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>AI & Neural Systems</strong></td><td>Generative AI, Large Language Models (LLMs), On-Device Inference, Prompt Engineering</td></tr>
+            <tr><td><strong>Cybersecurity & Infra</strong></td><td>Digital Safety Architecture, Network Protocol Analysis, Intranet Mesh Networking, Virtualization</td></tr>
+            <tr><td><strong>Cloud & DevOps</strong></td><td>Google Cloud Platform (GCP), Firebase (Hosting & Realtime DB), Git, GitHub Actions</td></tr>
+            <tr><td><strong>Software Engineering</strong></td><td>Python, Java, C, Android SDK, Native Web Technologies (HTML5, CSS3, ES6+ JavaScript)</td></tr>
+          </tbody>
+        </table>
+
+        <div style="margin-bottom: 1.5rem;">
+          <h4>🚀 Strategic Projects & Portfolio</h4>
+          <ul style="color: #CBD5E1; font-size: 0.88rem; line-height: 1.6;">
+            <li><strong>⚡ Campus AI Supercomputer:</strong> Founder & Architect of a zero-cloud, 100% offline distributed intranet AI mesh portal pooling RAM/VRAM across campus devices.</li>
+            <li><strong>🧠 Prema AI Labs:</strong> Lead Developer of an AI-powered bilingual (Tamil & English) educational assistant enhancing digital learning accessibility.</li>
+            <li><strong>🛡️ SMNK Info Tech:</strong> Cybersecurity initiative delivering AI-driven threat mitigation, digital safety guidelines, and secure software practices.</li>
+            <li><strong>🛍️ DD Clothing:</strong> Full-stack e-commerce web platform engineered and deployed on Google Firebase Cloud Infrastructure.</li>
+          </ul>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <h4>🏆 Industry Certifications & Leadership</h4>
+          <p style="color: #CBD5E1; font-size: 0.88rem; line-height: 1.6; margin-top: 0.3rem;">
+            <strong>Head of KGiSL Campus Google Community</strong> • <strong>Google Student Ambassador</strong> • Google Cloud: <em>Introduction to Generative AI</em> • Google <em>AI Safety Course</em> • Multiple Google Developer Certifications • GUVI Advanced Python Certification.
+          </p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="common.js"></script>
+</body>
+</html>

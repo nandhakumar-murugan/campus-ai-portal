@@ -18,7 +18,7 @@
       <div class="logo-icon">⚡</div>
       <div class="brand-text">
         <h1>Campus AI <span class="badge-tag">Supercomputer</span></h1>
-        <p class="brand-sub">Created by <strong>Nandhakumar Murugan</strong> • <code>kgisledu.com</code> Network</p>
+        <p class="brand-sub">Created by <strong>Nandhakumar M.</strong> • KGiSL Institute of Technology (KGiSL ITech)</p>
       </div>
     </div>
     <div class="network-status-bar">
@@ -57,7 +57,10 @@
       <span class="tab-icon">🤝</span> Join Compute Pool
     </a>
     <a href="setup.html" class="nav-link" data-page="setup.html">
-      <span class="tab-icon">💻</span> VS Code & Developer Setup
+      <span class="tab-icon">💻</span> VS Code Setup
+    </a>
+    <a href="docs.html" class="nav-link" data-page="docs.html">
+      <span class="tab-icon">📚</span> Developer Docs
     </a>
   </nav>
 
@@ -70,6 +73,18 @@
         </div>
 
         <div class="setup-steps-grid">
+
+          <!-- Option 0: 1-Click Custom Extension -->
+          <div class="setup-card" style="border: 2px solid #00F2FE; background: rgba(0, 242, 254, 0.08); grid-column: span 3;">
+            <div class="step-num" style="background: linear-gradient(135deg, #00F2FE, #9D4EDD);">⭐</div>
+            <h3>Recommended: 1-Click Official VS Code Extension (Zero Config!)</h3>
+            <p style="margin-bottom: 0.8rem;">Created by <strong>Nandhakumar M.</strong> • Head of KGiSL Campus Google Community. Auto-detects campus Wi-Fi server, provides Tab-Autocomplete, Chat Sidebar, Tamil Explanations, and Security Vulnerability Auditing.</p>
+            <div class="code-block-wrapper">
+              <pre><code id="code-install-ext">powershell -Command "Expand-Archive -Path 'vscode-extension' -DestinationPath '$env:USERPROFILE\.vscode\extensions\nandhakumar-murugan.campus-ai-copilot-1.0.0' -Force"</code></pre>
+              <button class="btn-copy" data-target="code-install-ext" onclick="copySnippet(this)">📋 Copy 1-Click Setup Command</button>
+            </div>
+            <p style="font-size: 0.82rem; color: #4ADE80; margin-top: 0.6rem;">⚡ <strong>How to test:</strong> Open or restart VS Code! Look for <code>⚡ Campus AI: Connected</code> in the status bar at bottom right.</p>
+          </div>
 
           <!-- Step 1: VS Code Continue -->
           <div class="setup-card">

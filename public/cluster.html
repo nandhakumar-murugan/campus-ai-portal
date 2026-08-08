@@ -18,7 +18,7 @@
       <div class="logo-icon">⚡</div>
       <div class="brand-text">
         <h1>Campus AI <span class="badge-tag">Supercomputer</span></h1>
-        <p class="brand-sub">Created by <strong>Nandhakumar Murugan</strong> • <code>kgisledu.com</code> Network</p>
+        <p class="brand-sub">Created by <strong>Nandhakumar M.</strong> • KGiSL Institute of Technology (KGiSL ITech)</p>
       </div>
     </div>
     <div class="network-status-bar">
@@ -57,7 +57,10 @@
       <span class="tab-icon">🤝</span> Join Compute Pool
     </a>
     <a href="setup.html" class="nav-link" data-page="setup.html">
-      <span class="tab-icon">💻</span> VS Code & Developer Setup
+      <span class="tab-icon">💻</span> VS Code Setup
+    </a>
+    <a href="docs.html" class="nav-link" data-page="docs.html">
+      <span class="tab-icon">📚</span> Developer Docs
     </a>
   </nav>
 
@@ -65,20 +68,20 @@
     <section id="cluster-monitor">
       <div class="cluster-grid">
 
-        <!-- Metrics Overview Cards -->
+        <!-- Metrics Overview Cards (Strictly Registered Contributor Students) -->
         <div class="metric-card">
           <div class="metric-icon">🔷</div>
           <div class="metric-data">
             <h2 id="total-nodes-val">Scanning...</h2>
-            <p>Real Active Subnet Devices</p>
+            <p id="total-nodes-sub">Active Contributor Student Laptops</p>
           </div>
         </div>
 
-        <div class="metric-card">
+        <div class="metric-card" style="border-color: rgba(157, 78, 221, 0.5); background: rgba(157, 78, 221, 0.08);">
           <div class="metric-icon">🧠</div>
           <div class="metric-data">
-            <h2 id="total-vram-val">Scanning...</h2>
-            <p>Real Available RAM Memory</p>
+            <h2 id="total-vram-val" style="color: #00F2FE;">Scanning...</h2>
+            <p id="total-vram-sub">Live Contributed Memory Pool</p>
           </div>
         </div>
 
@@ -86,7 +89,7 @@
           <div class="metric-icon">⚡</div>
           <div class="metric-data">
             <h2 id="total-ram-val">Scanning...</h2>
-            <p>Real Total Installed System RAM</p>
+            <p id="total-ram-sub">Total Registered Contributor Pool</p>
           </div>
         </div>
 
@@ -94,7 +97,7 @@
           <div class="metric-icon">🎛️</div>
           <div class="metric-data">
             <h2 id="cpu-usage-val">Scanning...</h2>
-            <p>Real Host CPU Utilization</p>
+            <p>Host System CPU Utilization</p>
           </div>
         </div>
 
@@ -109,6 +112,7 @@
                 <th>Hardware / Laptop Spec</th>
                 <th>Campus IP</th>
                 <th>RAM / VRAM</th>
+                <th>Live Resource Load (CPU / RAM)</th>
                 <th>Contributor Role</th>
                 <th>Status</th>
               </tr>
@@ -201,10 +205,12 @@
         ctx.fillText('HOST PC', centerX, centerY - 2);
         ctx.fillText(clusterState.hostIP, centerX, centerY + 10);
 
-        const realNodes = clusterState.nodes && clusterState.nodes.length > 0 ? clusterState.nodes : [{ name: 'Host', ip: clusterState.hostIP }];
-        const nodeCount = realNodes.length;
+        const satelliteNodes = (clusterState.nodes && clusterState.nodes.length > 0)
+          ? clusterState.nodes.filter(n => n.id !== 'host-primary' && n.ip !== clusterState.hostIP)
+          : [];
+        const nodeCount = satelliteNodes.length;
 
-        realNodes.forEach((node, i) => {
+        satelliteNodes.forEach((node, i) => {
           const nodeAngle = angle + (i * (Math.PI * 2 / nodeCount));
           const nx = centerX + Math.cos(nodeAngle) * radius;
           const ny = centerY + Math.sin(nodeAngle) * radius;
@@ -251,13 +257,26 @@
         clusterState.hostIP = data.hostIP || window.location.hostname;
         
         const totalNodesVal = document.getElementById('total-nodes-val');
-        if (totalNodesVal && data.totals) totalNodesVal.innerText = `${data.totals.activeCount} Subnet Nodes`;
+        if (totalNodesVal && data.totals) totalNodesVal.innerText = `${data.totals.activeCount} Online Nodes`;
+
+        const totalNodesSub = document.getElementById('total-nodes-sub');
+        if (totalNodesSub && data.totals) totalNodesSub.innerText = `Out of ${data.totals.totalContributorsCount || 3} Registered Contributor Laptops`;
 
         const totalVramVal = document.getElementById('total-vram-val');
-        if (totalVramVal && data.sys) totalVramVal.innerText = `${data.sys.freeRAMGB} GB Free`;
+        if (totalVramVal && data.totals) {
+          const pRam = data.totals.pooledContributorRAM || 32;
+          const pVram = data.totals.pooledContributorVRAM || 12;
+          totalVramVal.innerText = `${pRam} GB RAM / ${pVram} GB VRAM`;
+        }
+
+        const totalVramSub = document.getElementById('total-vram-sub');
+        if (totalVramSub) totalVramSub.innerText = `Live Contributed Memory Pool`;
 
         const totalRamVal = document.getElementById('total-ram-val');
-        if (totalRamVal && data.sys) totalRamVal.innerText = `${data.sys.totalRAMGB} GB Total`;
+        if (totalRamVal && data.totals) totalRamVal.innerText = `${data.totals.totalContributorRAM || 48} GB RAM`;
+
+        const totalRamSub = document.getElementById('total-ram-sub');
+        if (totalRamSub) totalRamSub.innerText = `Total Registered Contributor Pool`;
 
         const cpuUsageVal = document.getElementById('cpu-usage-val');
         if (cpuUsageVal && data.sys) cpuUsageVal.innerText = `${data.sys.cpuUsagePercent}%`;
@@ -268,31 +287,55 @@
             { name: 'Nandhakumar Murugan (Lead)', type: '12-Core Intel i5 Host', ip: clusterState.hostIP, ramGB: 16, vramGB: 8, role: 'Primary Lead Host', status: 'Online' }
           ];
 
-          regContributorsBody.innerHTML = contributors.map(c => `
-            <tr style="background: rgba(0, 242, 254, 0.05);">
-              <td><strong style="color: #00F2FE;">⭐ ${escapeHtml(c.name)}</strong></td>
-              <td>${escapeHtml(c.type)}</td>
-              <td><code>${c.ip}</code></td>
-              <td>${c.ramGB || 16} GB RAM / ${c.vramGB || 4} GB VRAM</td>
-              <td><span class="badge-tag">${c.role || 'Contributor Node'}</span></td>
-              <td><span class="badge-success">Online</span></td>
-            </tr>
-          `).join('');
+          regContributorsBody.innerHTML = contributors.map(c => {
+            const isOnline = (c.status === 'Online');
+            const badgeHtml = isOnline 
+              ? `<span class="badge-status-online">🟢 Online</span>` 
+              : `<span class="badge-status-offline">🔴 Offline</span>`;
+            
+            let loadHtml = '<span style="color:#64748B;">-- (Offline)</span>';
+            if (isOnline) {
+              const lu = c.liveUsage;
+              if (lu && lu.isLive) {
+                loadHtml = `<span style="color:#00F2FE; font-weight:600;">${lu.cpuPercent}% CPU</span> • <span style="color:#A78BFA; font-weight:600;">${lu.usedRAMGB} GB RAM Used (${lu.ramUsagePercent}%)</span>`;
+              } else {
+                loadHtml = `<span style="color:#FBBF24; font-weight:500;">⏳ Awaiting Live Report...</span>`;
+              }
+            }
+
+            return `
+              <tr style="background: rgba(0, 242, 254, 0.05);">
+                <td><strong style="color: #00F2FE;">⭐ ${escapeHtml(c.name)}</strong></td>
+                <td>${escapeHtml(c.type)}</td>
+                <td><code>${c.ip}</code></td>
+                <td>${c.ramGB || 16} GB RAM / ${c.vramGB || 4} GB VRAM</td>
+                <td>${loadHtml}</td>
+                <td><span class="badge-tag">${c.role || 'Contributor Node'}</span></td>
+                <td>${badgeHtml}</td>
+              </tr>
+            `;
+          }).join('');
         }
 
         const nodesTableBody = document.getElementById('nodes-table-body');
         if (nodesTableBody && data.nodes) {
-          nodesTableBody.innerHTML = data.nodes.map(n => `
-            <tr>
-              <td><strong>${escapeHtml(n.name)}</strong></td>
-              <td>${escapeHtml(n.type)}</td>
-              <td><code>${n.ip}</code></td>
-              <td>${n.ramGB || 16} GB RAM / ${n.vramGB || 4} GB VRAM</td>
-              <td><span class="badge-tag">${n.role}</span></td>
-              <td>~${n.latencyMs} ms</td>
-              <td><span class="badge-success">${n.status}</span></td>
-            </tr>
-          `).join('');
+          nodesTableBody.innerHTML = data.nodes.map(n => {
+            const isOnline = (n.status === 'Online');
+            const badgeHtml = isOnline 
+              ? `<span class="badge-status-online">🟢 Online</span>` 
+              : `<span class="badge-status-offline">🔴 Offline</span>`;
+            return `
+              <tr>
+                <td><strong>${escapeHtml(n.name)}</strong></td>
+                <td>${escapeHtml(n.type)}</td>
+                <td><code>${n.ip}</code></td>
+                <td>${n.ramGB || 16} GB RAM / ${n.vramGB || 4} GB VRAM</td>
+                <td><span class="badge-tag">${n.role}</span></td>
+                <td>~${n.latencyMs} ms</td>
+                <td>${badgeHtml}</td>
+              </tr>
+            `;
+          }).join('');
         }
       });
     });

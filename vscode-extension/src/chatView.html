@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif);
+      background: #0D1117;
+      color: #C9D1D9;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      font-size: 13px;
+    }
+
+    /* Premium Glassmorphism Header */
+    .header {
+      padding: 8px 12px;
+      background: #161B22;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .brand-row { display: flex; align-items: center; justify-content: space-between; }
+    .brand {
+      font-weight: 700;
+      color: #00F2FE;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    .hdr-actions { display: flex; gap: 6px; }
+    .hdr-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #C9D1D9;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .hdr-btn:hover { background: rgba(0, 242, 254, 0.15); border-color: #00F2FE; color: #00F2FE; }
+
+    .stats-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 10px;
+      color: #8B949E;
+    }
+    .stat-badge { color: #00F2FE; font-weight: 600; }
+    .budget-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #C9D1D9;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 9px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .budget-btn.active { background: #DA3633; border-color: #F85149; color: #FFF; }
+    .row { display: flex; gap: 6px; align-items: center; }
+    select {
+      flex: 1;
+      background: #21262D;
+      color: #F0F6FC;
+      border: 1px solid #30363D;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 11px;
+      outline: none;
+    }
+
+    /* Drawers */
+    .history-drawer {
+      display: none;
+      background: #161B22;
+      border-bottom: 1px solid #30363D;
+      padding: 8px 12px;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+    .history-drawer.open { display: flex; flex-direction: column; gap: 4px; }
+    .history-item {
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #C9D1D9;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.15s ease;
+    }
+    .history-item:hover { background: #21262D; color: #00F2FE; }
+
+    /* Feed Area */
+    .feed {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #0D1117;
+    }
+
+    /* Flat Message Blocks */
+    .msg-block { display: flex; flex-direction: column; width: 100%; }
+
+    /* User Prompt */
+    .user-block {
+      align-self: flex-end;
+      width: fit-content;
+      max-width: 90%;
+      background: transparent;
+      border: none;
+      padding: 4px 0;
+      margin-left: auto;
+    }
+    .user-text {
+      color: #00F2FE;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+      word-break: break-word;
+      text-align: right;
+    }
+
+    /* AI Response Card */
+    .ai-block {
+      align-self: flex-start;
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 4px 0;
+    }
+    .ai-text { color: #C9D1D9; line-height: 1.55; font-size: 13px; word-break: break-word; }
+
+    /* Action Toolbar */
+    .action-row { display: flex; gap: 10px; margin-top: 4px; color: #8B949E; font-size: 11px; justify-content: flex-start; opacity: 0.7; }
+    .action-row:hover { opacity: 1; }
+    .action-icon { cursor: pointer; transition: color 0.15s; }
+    .action-icon:hover { color: #00F2FE; }
+
+    /* GitHub Style Code Box */
+    .code-box {
+      background: #161B22;
+      border: 1px solid #30363D;
+      border-radius: 6px;
+      margin: 6px 0;
+      overflow: hidden;
+    }
+    .code-head {
+      background: #21262D;
+      padding: 4px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: monospace;
+      font-size: 11px;
+      color: #8B949E;
+      border-bottom: 1px solid #30363D;
+    }
+    .code-head button {
+      background: #30363D;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #F0F6FC;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 10px;
+      cursor: pointer;
+      margin-left: 4px;
+      transition: all 0.15s ease;
+    }
+    .code-head button:hover { background: #00F2FE; color: #0D1117; font-weight: 600; }
+    .code-body { padding: 10px; font-family: monospace; font-size: 12px; color: #79C0FF; overflow-x: auto; line-height: 1.5; }
+
+    /* ANTIGRAVITY 2.0 FLOATING QUESTION CARD ABOVE CHATBOX */
+    .floating-ask-card {
+      display: none;
+      position: absolute;
+      bottom: 75px;
+      left: 12px;
+      right: 12px;
+      background: #161B22;
+      border: 1px solid #00F2FE;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 8px 32px rgba(0, 242, 254, 0.25);
+      z-index: 200;
+      backdrop-filter: blur(8px);
+      animation: slideUp 0.2s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .floating-ask-card.open { display: flex; flex-direction: column; gap: 8px; }
+    .ask-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px; }
+    .ask-title { font-weight: 700; color: #00F2FE; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+    .ask-close-btn { background: transparent; border: none; color: #8B949E; cursor: pointer; font-size: 14px; }
+    .ask-close-btn:hover { color: #F85149; }
+
+    .ask-options { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+    .ask-opt-btn {
+      background: #21262D;
+      border: 1px solid #30363D;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 11px;
+      color: #C9D1D9;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.15s ease;
+    }
+    .ask-opt-btn:hover {
+      background: rgba(0, 242, 254, 0.15);
+      border-color: #00F2FE;
+      color: #00F2FE;
+    }
+    .ask-opt-num {
+      background: #30363D;
+      color: #F0F6FC;
+      font-weight: 700;
+      font-size: 10px;
+      border-radius: 4px;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Slash Menu */
+    .slash-menu {
+      display: none;
+      position: absolute;
+      bottom: 60px;
+      left: 12px;
+      right: 12px;
+      background: #161B22;
+      border: 1px solid #30363D;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      overflow: hidden;
+      z-index: 100;
+    }
+    .slash-menu.open { display: flex; flex-direction: column; }
+    .slash-item {
+      padding: 8px 12px;
+      font-size: 11px;
+      color: #C9D1D9;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.15s ease;
+    }
+    .slash-item:hover { background: #21262D; color: #00F2FE; }
+    .slash-cmd { font-weight: 600; color: #00F2FE; }
+
+    /* Footer Input Area */
+    .footer {
+      position: relative;
+      padding: 8px 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #161B22;
+    }
+    .chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+    .chip {
+      background: #21262D;
+      border: 1px solid #30363D;
+      border-radius: 14px;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: #C9D1D9;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .chip:hover { border-color: #00F2FE; color: #00F2FE; }
+
+    .input-box-wrap {
+      display: flex;
+      align-items: flex-end;
+      background: #0D1117;
+      border: 1px solid #30363D;
+      border-radius: 8px;
+      padding: 6px 10px;
+      gap: 6px;
+    }
+    .input-box-wrap:focus-within { border-color: #00F2FE; }
+    textarea {
+      flex: 1;
+      height: 38px;
+      max-height: 120px;
+      background: transparent;
+      color: #F0F6FC;
+      border: none;
+      font-size: 13px;
+      resize: none;
+      outline: none;
+      font-family: inherit;
+    }
+    .btn-submit {
+      background: #00F2FE;
+      color: #0D1117;
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+    .btn-submit:hover { background: #38F9D7; transform: scale(1.05); }
+    .btn-stop { background: #DA3633 !important; color: #FFF !important; }
+
+    .cursor-blink {
+      display: inline-block;
+      width: 6px;
+      height: 14px;
+      background: #00F2FE;
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 0.6s infinite;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand-row">
+      <div class="brand">⚡ Campus AI Copilot</div>
+      <div class="hdr-actions">
+        <button class="hdr-btn" id="hdr-mesh-btn" onclick="toggleMeshDrawer()">🌐 Mesh (1)</button>
+        <button class="hdr-btn" onclick="toggleSkillsDrawer()">🧩 Skills</button>
+        <button class="hdr-btn" onclick="startNewChat()">➕ New Chat</button>
+        <button class="hdr-btn" onclick="toggleHistoryDrawer()">📜 History</button>
+      </div>
+    </div>
+
+    <!-- Live Routing Stats Dashboard -->
+    <div class="stats-bar">
+      <div>Reqs: <span class="stat-badge" id="stat-reqs">0</span> | Tokens: <span class="stat-badge" id="stat-tokens">0</span></div>
+      <div>
+        <button class="budget-btn" id="btn-budget" onclick="toggleBudget()">Hard Budget: OFF</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <select id="model">
+        <option value="gemini-3.6-flash">Google Gemini 3.6 Flash (Latest)</option>
+        <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+        <option value="gemini-3.1-flash-lite">Google Gemini 3.1 Flash-Lite (500 RPD)</option>
+        <option value="gemini-3.5-flash-lite">Google Gemini 3.5 Flash-Lite (500 RPD)</option>
+        <option value="qwen-2.5-coder">Qwen 2.5 Coder (Local Mesh)</option>
+        <option value="deepseek-r1">DeepSeek-R1 (32B)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Drawers -->
+  <div class="history-drawer" id="history-drawer">
+    <div style="font-size:10px;color:#8B949E;margin-bottom:4px;font-weight:600;">PAST CHAT SESSIONS</div>
+    <div id="history-list"></div>
+  </div>
+
+  <div class="history-drawer" id="skills-drawer">
+    <div style="font-size:10px;color:#00F2FE;margin-bottom:4px;font-weight:600;">CLAUDE CODE & ANTIGRAVITY AGENTIC SKILLS</div>
+    <div class="history-item" onclick="activateSkill('architecture-analyst')"><span>🏗️ Architecture Analyst</span><span style="font-size:9px;color:#00F2FE;">Activate</span></div>
+    <div class="history-item" onclick="activateSkill('security-auditor')"><span>🛡️ Security Auditor</span><span style="font-size:9px;color:#00F2FE;">Activate</span></div>
+    <div class="history-item" onclick="activateSkill('fullstack-builder')"><span>🚀 Full Stack Builder</span><span style="font-size:9px;color:#00F2FE;">Activate</span></div>
+    <div class="history-item" onclick="activateSkill('refactor-engineer')"><span>⚡ Refactor Engineer</span><span style="font-size:9px;color:#00F2FE;">Activate</span></div>
+    <div class="history-item" onclick="activateSkill('test-suite-generator')"><span>🧪 Test Suite Generator</span><span style="font-size:9px;color:#00F2FE;">Activate</span></div>
+  </div>
+
+  <div class="history-drawer" id="mesh-drawer">
+    <div style="font-size:10px;color:#00F2FE;margin-bottom:4px;font-weight:600;display:flex;justify-content:space-between;">
+      <span>INTRANET P2P MESH CLUSTER</span>
+      <span id="mesh-totals">RAM: 16GB | VRAM: 8GB</span>
+    </div>
+    <div id="mesh-node-list">
+      <div class="history-item"><span>💻 Host Node (Local)</span><span style="font-size:9px;color:#3FB950;">ONLINE (1ms)</span></div>
+    </div>
+  </div>
+
+  <div class="feed" id="feed">
+    <div class="msg-block ai-block">
+      <div class="ai-text">வணக்கம்! Hello! How can I help you write code or audit security today?</div>
+    </div>
+  </div>
+
+  <!-- FLOATING ANTIGRAVITY 2.0 QUESTION CARD (DISAPPEARS ON SELECTION) -->
+  <div class="floating-ask-card" id="floating-ask-card">
+    <div class="ask-card-header">
+      <div class="ask-title" id="ask-title-text">🗳️ Select an option</div>
+      <button class="ask-close-btn" onclick="dismissAskCard()">✕</button>
+    </div>
+    <div class="ask-options" id="ask-options-container"></div>
+  </div>
+
+  <div class="footer">
+    <div class="slash-menu" id="slash-menu">
+      <div class="slash-item" onclick="selectSlash('/goal ')"><span class="slash-cmd">/goal</span><span>Run 10-30 min autonomous agent goal</span></div>
+      <div class="slash-item" onclick="selectSlash('/research ')"><span class="slash-cmd">/research</span><span>Run multi-step deep research</span></div>
+      <div class="slash-item" onclick="selectSlash('/explain ')"><span class="slash-cmd">/explain</span><span>Explain code logic</span></div>
+      <div class="slash-item" onclick="selectSlash('/fix ')"><span class="slash-cmd">/fix</span><span>Fix diagnostic errors</span></div>
+      <div class="slash-item" onclick="selectSlash('/tests ')"><span class="slash-cmd">/tests</span><span>Generate unit tests</span></div>
+      <div class="slash-item" onclick="selectSlash('/schedule ')"><span class="slash-cmd">/schedule</span><span>Set cron or timer</span></div>
+    </div>
+    <div class="chips">
+      <span class="chip" onclick="quick('/goal Create a full stack web application with HTML, CSS, JS and Express backend')">🚀 Build Full Stack App</span>
+      <span class="chip" onclick="quick('/research Analyze project architecture & security risks')">🔬 Deep Research</span>
+      <span class="chip" onclick="quick('@workspace tell about this project')">🌐 @workspace</span>
+      <span class="chip" onclick="quick('/explain the selected code')">🧠 /explain</span>
+      <span class="chip" onclick="quick('/fix all diagnostic errors')">🔧 /fix</span>
+    </div>
+    <div class="input-box-wrap">
+      <textarea id="prompt" placeholder="Ask Copilot or type / for commands..." onkeydown="handleKey(event)"></textarea>
+      <button class="btn-submit" id="btn-submit" onclick="handleSubmit()" title="Send">↑</button>
+    </div>
+  </div>
+
+  <script>
+    var vscode;
+    var isGenerating = false;
+    var currentTimer = null;
+    var isHardBudget = false;
+    var chatSessions = [];
+
+    try {
+      vscode = acquireVsCodeApi();
+    } catch (e) {
+      vscode = { postMessage: function() {} };
+    }
+
+    function post(cmd, extra) {
+      vscode.postMessage(Object.assign({ command: cmd }, extra || {}));
+    }
+
+    function toggleMeshDrawer() {
+      var drawer = document.getElementById('mesh-drawer');
+      var histDrawer = document.getElementById('history-drawer');
+      var skillsDrawer = document.getElementById('skills-drawer');
+      if (histDrawer) histDrawer.classList.remove('open');
+      if (skillsDrawer) skillsDrawer.classList.remove('open');
+      if (drawer) drawer.classList.toggle('open');
+    }
+
+    function toggleSkillsDrawer() {
+      var drawer = document.getElementById('skills-drawer');
+      var histDrawer = document.getElementById('history-drawer');
+      var meshDrawer = document.getElementById('mesh-drawer');
+      if (histDrawer) histDrawer.classList.remove('open');
+      if (meshDrawer) meshDrawer.classList.remove('open');
+      if (drawer) drawer.classList.toggle('open');
+    }
+
+    function activateSkill(skillName) {
+      var area = document.getElementById('prompt');
+      var drawer = document.getElementById('skills-drawer');
+      if (area) {
+        area.value = `[ACTIVATE AGENT SKILL: ${skillName}] Analyze workspace using ${skillName} skill.`;
+        send();
+      }
+      if (drawer) drawer.classList.remove('open');
+    }
+
+    function toggleHistoryDrawer() {
+      var drawer = document.getElementById('history-drawer');
+      var skillsDrawer = document.getElementById('skills-drawer');
+      var meshDrawer = document.getElementById('mesh-drawer');
+      if (skillsDrawer) skillsDrawer.classList.remove('open');
+      if (meshDrawer) meshDrawer.classList.remove('open');
+      if (drawer) drawer.classList.toggle('open');
+      renderHistoryList();
+    }
+
+    function startNewChat() {
+      var feed = document.getElementById('feed');
+      if (feed && feed.children.length > 1) {
+        var title = feed.querySelector('.user-text') ? feed.querySelector('.user-text').innerText.substring(0, 30) : 'Chat Session';
+        chatSessions.unshift({ id: 'session-' + Date.now(), title: title, html: feed.innerHTML });
+        if (chatSessions.length > 15) chatSessions.pop();
+        localStorage.setItem('campus_sessions', JSON.stringify(chatSessions));
+      }
+
+      feed.innerHTML = '<div class="msg-block ai-block"><div class="ai-text">வணக்கம்! Hello! How can I help you write code or audit security today?</div></div>';
+      dismissAskCard();
+      saveChatHistory();
+      renderHistoryList();
+    }
+
+    function renderHistoryList() {
+      var listEl = document.getElementById('history-list');
+      if (!listEl) return;
+      try {
+        var saved = localStorage.getItem('campus_sessions');
+        if (saved) chatSessions = JSON.parse(saved);
+      } catch (e) {}
+
+      if (chatSessions.length === 0) {
+        listEl.innerHTML = '<div style="font-size:11px;color:#6E7681;padding:4px;">No past chat sessions saved yet.</div>';
+        return;
+      }
+
+      var html = '';
+      chatSessions.forEach(function(s, idx) {
+        html += '<div class="history-item" onclick="loadSession(' + idx + ')"><span>💬 ' + escapeHtml(s.title) + '</span><span style="font-size:9px;color:#00F2FE;">Restore</span></div>';
+      });
+      listEl.innerHTML = html;
+    }
+
+    function loadSession(idx) {
+      if (chatSessions[idx]) {
+        var feed = document.getElementById('feed');
+        feed.innerHTML = chatSessions[idx].html;
+        feed.scrollTop = feed.scrollHeight;
+        saveChatHistory();
+        document.getElementById('history-drawer').classList.remove('open');
+      }
+    }
+
+    function toggleBudget() {
+      isHardBudget = !isHardBudget;
+      var btn = document.getElementById('btn-budget');
+      if (isHardBudget) {
+        btn.innerText = 'Hard Budget: ON ($0.00)';
+        btn.classList.add('active');
+      } else {
+        btn.innerText = 'Hard Budget: OFF';
+        btn.classList.remove('active');
+      }
+      post('setBudget', { enabled: isHardBudget });
+    }
+
+    function handleKey(e) {
+      var area = document.getElementById('prompt');
+      var menu = document.getElementById('slash-menu');
+      if (area && area.value === '/' && e.key !== 'Backspace') {
+        if (menu) menu.classList.add('open');
+      } else if (menu && e.key === 'Escape') {
+        menu.classList.remove('open');
+      }
+
+      if (e.key === 'Enter' && !e.shiftKey) {
+        if (menu) menu.classList.remove('open');
+        e.preventDefault();
+        handleSubmit();
+      }
+    }
+
+    function selectSlash(cmd) {
+      var area = document.getElementById('prompt');
+      var menu = document.getElementById('slash-menu');
+      if (area) {
+        area.value = cmd;
+        area.focus();
+      }
+      if (menu) menu.classList.remove('open');
+    }
+
+    function handleSubmit() {
+      if (isGenerating) {
+        post('cancelQuery');
+        setGeneratingState(false);
+      } else {
+        send();
+      }
+    }
+
+    function setGeneratingState(generating) {
+      isGenerating = generating;
+      var btn = document.getElementById('btn-submit');
+      if (generating) {
+        btn.innerText = '⏹';
+        btn.classList.add('btn-stop');
+        btn.title = 'Stop Generation';
+      } else {
+        btn.innerText = '↑';
+        btn.classList.remove('btn-stop');
+        btn.title = 'Send';
+      }
+    }
+
+    function quick(txt) {
+      document.getElementById('prompt').value = txt;
+      send();
+    }
+
+    // FLOATING ASK CARD MODAL HANDLERS
+    function showFloatingAskCard(title, options) {
+      var card = document.getElementById('floating-ask-card');
+      var titleEl = document.getElementById('ask-title-text');
+      var container = document.getElementById('ask-options-container');
+      if (!card || !container) return;
+
+      titleEl.innerText = '🗳️ ' + title;
+      var html = '';
+      options.forEach(function(opt, idx) {
+        html += '<div class="ask-opt-btn" onclick="selectQuestionOption(\'' + encodeURIComponent(opt) + '\')">' +
+          '<span class="ask-opt-num">' + (idx + 1) + '</span>' +
+          '<span>' + escapeHtml(opt) + '</span>' +
+          '</div>';
+      });
+      container.innerHTML = html;
+      card.classList.add('open');
+    }
+
+    function dismissAskCard() {
+      var card = document.getElementById('floating-ask-card');
+      if (card) card.classList.remove('open');
+    }
+
+    function selectQuestionOption(optRaw) {
+      var text = decodeURIComponent(optRaw);
+      dismissAskCard(); // CARD DISAPPEARS IMMEDIATELY AFTER SELECTION!
+      document.getElementById('prompt').value = text;
+      send();
+    }
+
+    function formatText(txt) {
+      if (!txt) return '';
+
+      // Check for [ASK_QUESTION: Title | Opt 1 | Opt 2]
+      var askMatch = txt.match(/\[ASK_QUESTION:\s*([^|\]]+)\|(.*?)\]/);
+      if (askMatch) {
+        var title = askMatch[1].trim();
+        var rawOpts = askMatch[2].split('|').map(function(o) { return o.trim(); }).filter(Boolean);
+        setTimeout(function() {
+          showFloatingAskCard(title, rawOpts);
+        }, 100);
+        txt = txt.replace(/\[ASK_QUESTION:[\s\S]*?\]/g, ''); // Strip from message text!
+      }
+
+      // 1. Antigravity File Changes Card
+      txt = txt.replace(/Modified (\d+) files \+?(\d+) \-?(\d+)/g, function(m, count, add, del) {
+        return '<div style="background:#161B22;border:1px solid #30363D;border-left:3px solid #58A6FF;border-radius:6px;padding:8px 12px;margin:8px 0;font-size:12px;color:#C9D1D9;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<span style="font-weight:600;color:#F0F6FC;">📁 Modified ' + count + ' files</span>' +
+          '<span><span style="color:#3FB950;font-weight:600;margin-right:6px;">+' + add + '</span><span style="color:#F85149;font-weight:600;">-' + del + '</span></span>' +
+          '</div></div>';
+      });
+
+      // 2. Tool execution step
+      txt = txt.replace(/Executed command and checked (\d+) files/g, function(m, count) {
+        return '<div style="background:#161B22;border:1px solid #30363D;border-radius:6px;padding:6px 10px;margin:6px 0;font-size:11px;color:#8B949E;display:flex;align-items:center;gap:6px;">' +
+          '⚡ <span>Executed command and checked ' + count + ' files</span></div>';
+      });
+
+      // 3. Code blocks with Copy / Insert / Apply to File / Create File
+      var formatted = txt.replace(/```(\w+)?\n([\s\S]*?)```/g, function(m, lang, code) {
+        var esc = escapeHtml(code.trim());
+        var raw = encodeURIComponent(code.trim());
+        return '<div class="code-box"><div class="code-head"><span>' + (lang || 'code') + '</span><div><button onclick="copyCode(this)">Copy</button><button onclick="insertCode(\'' + raw + '\')">📥 Insert</button><button onclick="applyDiffToFile(\'' + raw + '\')" style="background:#1F6FEB;color:#FFF;">📝 Apply to File</button><button onclick="promptCreateFile(\'' + raw + '\')">✨ Create File</button></div></div><pre class="code-body"><code>' + esc + '</code></pre></div>';
+      });
+
+      // 4. Badges
+      formatted = formatted.replace(/\[(JS|PY|HTML|CSS|TS|JSON)\s+([^\]]+)\]/g, '<span style="background:#21262D;border:1px solid #30363D;color:#58A6FF;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:11px;">📄 $2</span>');
+
+      // 5. Clean Inline Code Badges
+      formatted = formatted.replace(/`([^`]+)`/g, '<code style="background:#161B22;border:1px solid #30363D;color:#79C0FF;padding:2px 5px;border-radius:4px;font-family:monospace;font-size:11px;word-break:break-word;">$1</code>');
+
+      // 6. Headers
+      formatted = formatted.replace(/^### (.*$)/gim, '<h3 style="color:#00F2FE;margin:10px 0 4px 0;font-size:13px;font-weight:700;">$1</h3>');
+      formatted = formatted.replace(/^## (.*$)/gim, '<h2 style="color:#00F2FE;margin:12px 0 6px 0;font-size:14px;font-weight:700;">$1</h2>');
+      formatted = formatted.replace(/^# (.*$)/gim, '<h1 style="color:#00F2FE;margin:14px 0 8px 0;font-size:15px;font-weight:700;">$1</h1>');
+
+      // 7. Bold & Lists
+      formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#F0F6FC;font-weight:600;">$1</strong>');
+      formatted = formatted.replace(/^\s*[\*\-] (.*$)/gim, '<li style="margin-left:14px;margin-bottom:3px;">$1</li>');
+      formatted = formatted.replace(/^\s*(\d+)\. (.*$)/gim, '<div style="margin:4px 0 4px 10px;line-height:1.5;"><strong style="color:#00F2FE;">$1.</strong> $2</div>');
+
+      // 8. Clickable Web Links
+      formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color:#00F2FE;text-decoration:none;font-weight:600;">🌐 $1</a>');
+      formatted = formatted.replace(/^---$/gim, '<hr style="border:none;border-top:1px solid #30363D;margin:8px 0;">');
+
+      return formatted;
+    }
+
+    function send() {
+      var area = document.getElementById('prompt');
+      if (!area) return;
+      var text = area.value.trim();
+      if (!text) return;
+      area.value = '';
+
+      var feed = document.getElementById('feed');
+
+      var uBlock = document.createElement('div');
+      uBlock.className = 'msg-block user-block';
+      uBlock.innerHTML = '<div class="user-text">' + escapeHtml(text) + '</div>';
+      feed.appendChild(uBlock);
+
+      var modelSelect = document.getElementById('model');
+      var model = modelSelect ? modelSelect.value : 'gemini-3.6-flash';
+      var msgId = 'msg-' + Date.now();
+
+      var aBlock = document.createElement('div');
+      aBlock.className = 'msg-block ai-block';
+      aBlock.innerHTML = '<div class="ai-text" id="' + msgId + '"><span class="cursor-blink"></span></div>' +
+        '<div class="action-row">' +
+        '<span class="action-icon" title="Read Aloud" onclick="speakText(this)">🔊</span>' +
+        '<span class="action-icon" title="Copy" onclick="copyMsg(this)">📋</span>' +
+        '<span class="action-icon" title="Good">👍</span>' +
+        '<span class="action-icon" title="Bad">👎</span>' +
+        '</div>';
+
+      feed.appendChild(aBlock);
+      feed.scrollTop = feed.scrollHeight;
+
+      saveChatHistory();
+
+      setGeneratingState(true);
+      post('query', { id: msgId, prompt: text, model: model });
+    }
+
+    function speakText(el) {
+      var block = el.closest('.msg-block');
+      if (!block) return;
+      var textEl = block.querySelector('.ai-text');
+      if (!textEl) return;
+      var u = new SpeechSynthesisUtterance(textEl.innerText);
+      speechSynthesis.speak(u);
+    }
+
+    function copyMsg(el) {
+      var block = el.closest('.msg-block');
+      if (!block) return;
+      var textEl = block.querySelector('.ai-text');
+      if (!textEl) return;
+      navigator.clipboard.writeText(textEl.innerText);
+      el.innerText = '✅';
+      setTimeout(function() { el.innerText = '📋'; }, 1500);
+    }
+
+    window.addEventListener('message', function(e) {
+      var msg = e.data;
+      if (msg && msg.command === 'response') {
+        typeWriterEffect(msg.id, msg.text);
+      } else if (msg && msg.command === 'stats') {
+        document.getElementById('stat-reqs').innerText = msg.requests;
+        document.getElementById('stat-tokens').innerText = msg.tokens;
+      } else if (msg && msg.command === 'meshStats') {
+        var btn = document.getElementById('hdr-mesh-btn');
+        if (btn) btn.innerText = '🌐 Mesh (' + msg.activeNodes + ')';
+        var totals = document.getElementById('mesh-totals');
+        if (totals) totals.innerText = 'RAM: ' + msg.totalRamGB + 'GB | VRAM: ' + msg.totalVramGB + 'GB';
+        
+        var listEl = document.getElementById('mesh-node-list');
+        if (listEl && msg.nodes) {
+          var html = '';
+          msg.nodes.forEach(function(n) {
+            html += '<div class="history-item"><span>💻 ' + escapeHtml(n.name) + ' (' + n.ip + ')</span><span style="font-size:9px;color:#3FB950;">ONLINE (' + n.latencyMs + 'ms)</span></div>';
+          });
+          listEl.innerHTML = html;
+        }
+      }
+    });
+
+    function typeWriterEffect(elementId, fullText) {
+      var elem = document.getElementById(elementId);
+      if (!elem) {
+        setGeneratingState(false);
+        return;
+      }
+      var index = 0;
+      elem.innerHTML = '';
+      if (currentTimer) clearInterval(currentTimer);
+
+      currentTimer = setInterval(function() {
+        if (index < fullText.length) {
+          index += 1;
+          elem.innerHTML = formatText(fullText.substring(0, index)) + '<span class="cursor-blink"></span>';
+          document.getElementById('feed').scrollTop = document.getElementById('feed').scrollHeight;
+        } else {
+          clearInterval(currentTimer);
+          currentTimer = null;
+          elem.innerHTML = formatText(fullText);
+          setGeneratingState(false);
+          saveChatHistory();
+        }
+      }, 12);
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function copyCode(btn) {
+      var code = btn.closest('.code-box').querySelector('code').innerText;
+      navigator.clipboard.writeText(code);
+      btn.innerText = 'Copied!';
+      setTimeout(function() { btn.innerText = 'Copy'; }, 2000);
+    }
+
+    function insertCode(raw) {
+      post('insertCode', { code: decodeURIComponent(raw) });
+    }
+
+    function applyDiffToFile(raw) {
+      post('applyDiffToFile', { filePath: 'README.md', content: decodeURIComponent(raw) });
+    }
+
+    function promptCreateFile(raw) {
+      post('createFile', { filePath: 'generated_code.py', content: decodeURIComponent(raw) });
+    }
+
+    function saveChatHistory() {
+      var feed = document.getElementById('feed');
+      if (!feed) return;
+      try {
+        var state = { html: feed.innerHTML };
+        vscode.setState(state);
+        localStorage.setItem('campus_chat_history', feed.innerHTML);
+      } catch (e) {}
+    }
+
+    var isHistoryRestored = false;
+    function restoreChatHistory() {
+      if (isHistoryRestored) return;
+      var feed = document.getElementById('feed');
+      if (!feed) return;
+      
+      if (feed.querySelectorAll('.user-block').length > 0) return;
+
+      try {
+        var state = vscode.getState();
+        var savedHtml = (state && state.html) || localStorage.getItem('campus_chat_history');
+        if (savedHtml && savedHtml.trim().length > 50) {
+          feed.innerHTML = savedHtml;
+          feed.scrollTop = feed.scrollHeight;
+          isHistoryRestored = true;
+        }
+      } catch (e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', restoreChatHistory);
+    if (document.readyState !== 'loading') {
+      restoreChatHistory();
+    }
+  </script>
+</body>
+</html>

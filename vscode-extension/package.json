@@ -1,0 +1,206 @@
+{
+  "name": "campus-ai-copilot",
+  "displayName": "Campus AI Supercomputer Copilot",
+  "description": "100% Offline, Zero-Cloud AI Coding Assistant & Security Auditor for KGiSL Campus Intranet Network",
+  "version": "1.0.0",
+  "publisher": "nandhakumar-murugan",
+  "author": {
+    "name": "Nandhakumar M.",
+    "email": "nandhakumar@kgisledu.com"
+  },
+  "categories": [
+    "AI",
+    "Machine Learning",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "copilot",
+    "offline",
+    "security",
+    "campus-ai",
+    "gemma",
+    "deepseek",
+    "qwen",
+    "kgisl"
+  ],
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "campusAi.fixFileErrors",
+        "title": "Campus AI: Fix All Errors in Active File (Diff Preview)",
+        "icon": "$(tools)"
+      },
+      {
+        "command": "campusAi.inlineChat",
+        "title": "Campus AI: Inline Code Generator & Refactor (Ctrl+I)",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "campusAi.openChat",
+        "title": "Campus AI: Open Chat Studio",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "campusAi.securityAudit",
+        "title": "Campus AI: Run Security Audit & Code Check",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "campusAi.fixCurrentError",
+        "title": "Campus AI: Fix Current Error (with Preview)",
+        "icon": "$(wrench)"
+      },
+      {
+        "command": "campusAi.explainTamil",
+        "title": "Campus AI: Explain Code in Tamil & English",
+        "icon": "$(book)"
+      },
+      {
+        "command": "campusAi.reconnectServer",
+        "title": "Campus AI: Reconnect / Scan Network",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "campusAi.setApiKey",
+        "title": "Campus AI: Set Custom Paid API Key (OpenAI / Gemini / Claude)",
+        "icon": "$(key)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "campus-ai-sidebar",
+          "title": "Campus AI",
+          "icon": "$(zap)"
+        }
+      ]
+    },
+    "views": {
+      "campus-ai-sidebar": [
+        {
+          "type": "webview",
+          "id": "campusAi.chatView",
+          "name": "Campus AI Studio & Copilot"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "campusAi.inlineChat",
+        "key": "ctrl+i",
+        "mac": "cmd+i",
+        "when": "editorTextFocus"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "campusAi.securityAudit",
+          "group": "CampusAI@1",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "campusAi.explainTamil",
+          "group": "CampusAI@2",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "campusAi.fixCurrentError",
+          "group": "CampusAI@1.5",
+          "when": "editorTextFocus"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Campus AI Supercomputer",
+      "properties": {
+        "campusAi.provider": {
+          "type": "string",
+          "default": "campus-offline",
+          "enum": [
+            "campus-offline",
+            "openai",
+            "gemini",
+            "claude"
+          ],
+          "enumDescriptions": [
+            "Campus AI Offline Mesh (100% Free & Local)",
+            "OpenAI GPT-4o / GPT-4 (Requires API Key)",
+            "Google Gemini Pro / Flash (Requires API Key)",
+            "Anthropic Claude Sonnet / Opus (Requires API Key)"
+          ],
+          "description": "AI Service Provider (Campus Offline Free vs Custom Paid Keys)"
+        },
+        "campusAi.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Custom Paid API Key for OpenAI, Google Gemini, or Anthropic Claude"
+        },
+        "campusAi.serverUrl": {
+          "type": "string",
+          "default": "http://172.16.110.12:3000",
+          "description": "Primary Campus AI Server URL (Auto-detected on campus Wi-Fi)"
+        },
+        "campusAi.model": {
+          "type": "string",
+          "default": "qwen-2.5-coder",
+          "enum": [
+            "qwen-2.5-coder",
+            "gemma-2-2b",
+            "gemma-2-9b",
+            "deepseek-r1",
+            "deepseek-coder",
+            "llama-3.2-3b"
+          ],
+          "description": "Default AI Model for Autocomplete & Chat"
+        },
+        "campusAi.enableInlineAutocomplete": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable real-time Tab-completion inline suggestions"
+        },
+        "campusAi.enableAutoModelRouting": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically rotate across Gemini models when quota/rate limits are hit"
+        },
+        "campusAi.geminiModelPool": {
+          "type": "array",
+          "default": [
+            "gemini-2.5-flash",
+            "gemini-2.5-flash-lite",
+            "gemini-3.5-flash-lite",
+            "gemini-3.1-flash-lite"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "Gemini model fallback order used when auto model routing is enabled"
+        },
+        "campusAi.maxGeminiHistoryMessages": {
+          "type": "number",
+          "default": 8,
+          "minimum": 2,
+          "maximum": 20,
+          "description": "Maximum conversation turns to send in a Gemini request"
+        },
+        "campusAi.maxGeminiMessageChars": {
+          "type": "number",
+          "default": 4000,
+          "minimum": 500,
+          "maximum": 12000,
+          "description": "Maximum characters per message sent to Gemini to control token usage"
+        }
+      }
+    }
+  }
+}

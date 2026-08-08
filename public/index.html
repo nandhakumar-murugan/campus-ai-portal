@@ -18,7 +18,7 @@
       <div class="logo-icon">⚡</div>
       <div class="brand-text">
         <h1>Campus AI <span class="badge-tag">Supercomputer</span></h1>
-        <p class="brand-sub">Created by <strong>Nandhakumar Murugan</strong> • <code>kgisledu.com</code> Network</p>
+        <p class="brand-sub">Created by <strong>Nandhakumar M.</strong> • KGiSL Institute of Technology (KGiSL ITech)</p>
       </div>
     </div>
     <div class="network-status-bar">
@@ -57,7 +57,10 @@
       <span class="tab-icon">🤝</span> Join Compute Pool
     </a>
     <a href="setup.html" class="nav-link" data-page="setup.html">
-      <span class="tab-icon">💻</span> VS Code & Developer Setup
+      <span class="tab-icon">💻</span> VS Code Setup
+    </a>
+    <a href="docs.html" class="nav-link" data-page="docs.html">
+      <span class="tab-icon">📚</span> Developer Docs
     </a>
   </nav>
 
@@ -85,7 +88,7 @@
           </div>
 
           <div class="control-card">
-            <h3>⚙️ System Prompt</h3>
+            <h3>⚙️ System Prompt Persona</h3>
             <textarea id="system-prompt" class="custom-textarea" rows="3">You are Google Gemma / Campus AI, an expert software developer running offline on the KGiSL intranet network by Nandhakumar Murugan.</textarea>
           </div>
 
@@ -102,6 +105,10 @@
               <span>Google Model Privacy:</span>
               <span class="badge-success">100% Offline On-Premise</span>
             </div>
+            <div class="metric-row">
+              <span>Model Engine:</span>
+              <span id="model-status-badge" class="badge-status-offline" style="font-size:0.75rem;">🟡 Pre-loaded Local Engine</span>
+            </div>
           </div>
         </aside>
 
@@ -110,9 +117,14 @@
           <div class="chat-header">
             <div class="chat-title">
               <span class="chat-status-dot"></span>
-              <strong>Active Session:</strong> Google Gemma 2 / Campus AI Engine
+              <strong id="active-session-title">Active Session:</strong> <span id="session-model-name" style="color: #00F2FE;">Google Gemma 2 (2B Offline)</span>
             </div>
             <button class="btn-clear" id="clear-chat-btn">Clear History</button>
+          </div>
+
+          <!-- Live Engine Banner Notice -->
+          <div id="engine-notice-bar" style="background: rgba(19, 27, 46, 0.9); border-bottom: 1px solid rgba(0, 242, 254, 0.2); padding: 0.6rem 1.2rem; font-size: 0.82rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <span id="engine-notice-text" style="color: #94A3B8;">ℹ️ <strong>Current Engine:</strong> Pre-loaded Campus Assistant. Run <code>python llm_server.py</code> or <code>ollama run gemma2:2b</code> to connect 100% real neural weights.</span>
           </div>
 
           <div id="chat-messages" class="chat-messages">
@@ -121,10 +133,12 @@
               <div class="msg-content">
                 <h3>Welcome to Google Offline AI & Campus Supercomputer! 🚀</h3>
                 <p>Featuring <strong>Google Gemma 2 (2B & 9B)</strong> and <strong>Google Gemini Nano</strong> running 100% offline on your campus Wi-Fi network. Ask programming questions or generate code snippets instantly.</p>
-                <div class="quick-prompts">
-                  <button class="chip-prompt" data-prompt="Write a Python script for quicksort algorithm using Google Gemma">🔷 Google Gemma Quicksort</button>
-                  <button class="chip-prompt" data-prompt="How do I configure VS Code Continue extension for Google Gemma offline?">💻 VS Code Setup</button>
-                  <button class="chip-prompt" data-prompt="Create a React component for a live status gauge">⚛️ React Component</button>
+                <div class="quick-prompts" style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                  <button class="chip-prompt" data-prompt="Write a Python script for quicksort algorithm using Google Gemma">🔷 Quicksort Algorithm</button>
+                  <button class="chip-prompt" data-prompt="Create a Python FastAPI REST API connected to SQLite database">🐍 Python FastAPI + SQLite</button>
+                  <button class="chip-prompt" data-prompt="How do I configure VS Code Continue extension for Google Gemma offline?">💻 VS Code Copilot Setup</button>
+                  <button class="chip-prompt" data-prompt="Explain DeepSeek-R1 reasoning and chain of thought logic">🧠 DeepSeek-R1 Logic</button>
+                  <button class="chip-prompt" data-prompt="Create a React component for a live status gauge">⚛️ React Status Gauge</button>
                 </div>
               </div>
             </div>
@@ -155,10 +169,15 @@
       const clearChatBtn = document.getElementById('clear-chat-btn');
       const liveCpuElem = document.getElementById('live-cpu');
       const sidebarRamElem = document.getElementById('sidebar-vram');
+      const sessionModelName = document.getElementById('session-model-name');
+      const engineNoticeText = document.getElementById('engine-notice-text');
+      const modelStatusBadge = document.getElementById('model-status-badge');
 
       if (modelSelect) {
         modelSelect.addEventListener('change', (e) => {
           selectedModel = e.target.value;
+          const text = e.target.options[e.target.selectedIndex].text;
+          if (sessionModelName) sessionModelName.innerText = text.split('—')[0].trim();
         });
       }
 
@@ -211,7 +230,7 @@
             });
 
             const data = await response.json();
-            const content = data.choices[0].message.content;
+            const content = data.choices && data.choices[0] ? data.choices[0].message.content : 'No response content.';
             updateAssistantMessage(assistantMsgDiv, content);
           } catch (err) {
             updateAssistantMessage(assistantMsgDiv, '❌ Error connecting to Campus AI server. Please check your intranet Wi-Fi connection.');
@@ -241,15 +260,22 @@
       }
 
       function formatMarkdown(str) {
+        if (!str) return '';
         return str
           .replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
-            return `<div class="code-block-wrapper"><pre><code>${escapeHtml(code.trim())}</code></pre><button class="btn-copy" onclick="copySnippet(this)">Copy Code</button></div>`;
+            const langLabel = lang ? lang.toUpperCase() : 'CODE';
+            return `<div class="code-block-wrapper"><div class="code-block-header"><span>${langLabel}</span><button class="btn-copy" onclick="copySnippet(this)">Copy Code</button></div><pre><code>${escapeHtml(code.trim())}</code></pre></div>`;
           })
           .replace(/`([^`]+)`/g, '<code>$1</code>')
+          .replace(/^\s*###\s+(.*$)/gim, '<h3>$1</h3>')
+          .replace(/^\s*##\s+(.*$)/gim, '<h2>$1</h2>')
+          .replace(/^\s*\*\s+(.*$)/gim, '<li>$1</li>')
+          .replace(/^\s*-\s+(.*$)/gim, '<li>$1</li>')
           .replace(/\n\n/g, '<br><br>');
       }
 
       function escapeHtml(text) {
+        if (!text) return '';
         return text
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
@@ -258,7 +284,8 @@
       }
 
       window.copySnippet = function(btn) {
-        const code = btn.previousElementSibling.innerText;
+        const pre = btn.closest('.code-block-wrapper').querySelector('code');
+        const code = pre ? pre.innerText : '';
         navigator.clipboard.writeText(code);
         btn.innerText = 'Copied! ✅';
         setTimeout(() => btn.innerText = 'Copy Code', 2000);
@@ -269,6 +296,26 @@
         if (data && data.sys) {
           if (liveCpuElem) liveCpuElem.innerText = `${data.sys.cpuUsagePercent}% (${data.sys.cpuCores} Cores)`;
           if (sidebarRamElem) sidebarRamElem.innerText = `${data.sys.freeRAMGB} GB Free / ${data.sys.totalRAMGB} GB`;
+        }
+
+        if (data) {
+          if (data.isRealLlmActive) {
+            if (modelStatusBadge) {
+              modelStatusBadge.className = 'badge-status-online';
+              modelStatusBadge.innerText = '🟢 100% Real Neural Weights';
+            }
+            if (engineNoticeText) {
+              engineNoticeText.innerHTML = `🟢 <strong>Live Neural Model Engine Active!</strong> Model outputs are streamed from real neural network weights on <code style="color:#00F2FE;">${data.activeLlmNode ? data.activeLlmNode.name : 'Local Node'}</code>.`;
+            }
+          } else {
+            if (modelStatusBadge) {
+              modelStatusBadge.className = 'badge-status-offline';
+              modelStatusBadge.innerText = '🟡 Pre-loaded Local Engine';
+            }
+            if (engineNoticeText) {
+              engineNoticeText.innerHTML = `ℹ️ <strong>Current Engine:</strong> Pre-loaded Campus Assistant. Run <code style="color:#00F2FE;">python llm_server.py</code> or <code style="color:#00F2FE;">ollama run gemma2:2b</code> to connect 100% real neural weights.`;
+            }
+          }
         }
       });
     });

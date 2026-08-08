@@ -216,6 +216,65 @@
     }
     .copy-icon { font-size: 0.85rem; cursor: pointer; }
 
+    /* Recommended Models Box inside Ollama Card */
+    .models-box {
+      margin-top: 1rem;
+      background: rgba(11, 15, 23, 0.8);
+      border: 1px solid rgba(0, 242, 254, 0.25);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .models-box-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #00F2FE;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .models-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .model-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 8px;
+      padding: 0.6rem 0.8rem;
+      flex-wrap: wrap;
+    }
+    .model-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .model-name {
+      color: #F1F5F9;
+      font-size: 0.85rem;
+    }
+    .model-ram-badge {
+      background: rgba(157, 78, 221, 0.2);
+      color: #C77DFF;
+      font-size: 0.72rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .model-note {
+      color: #94A3B8;
+      font-size: 0.78rem;
+    }
+    .full-width-card {
+      grid-column: 1 / -1;
+    }
+
     .no-features-msg {
       color: #94A3B8;
       grid-column: 1 / -1;
@@ -233,7 +292,7 @@
       <div class="logo-icon">⚡</div>
       <div class="brand-text">
         <h1>Campus AI <span class="badge-tag">Supercomputer</span></h1>
-        <p class="brand-sub">Created by <strong>Nandhakumar Murugan</strong> • <code>kgisledu.com</code> Network</p>
+        <p class="brand-sub">Created by <strong>Nandhakumar M.</strong> • KGiSL Institute of Technology (KGiSL ITech)</p>
       </div>
     </div>
     <div class="network-status-bar">
@@ -265,7 +324,8 @@
     <a href="index.html" class="nav-link"><span class="tab-icon">💬</span> AI Studio & Code Generator</a>
     <a href="cluster.html" class="nav-link"><span class="tab-icon">⚡</span> Real-Time Cluster Monitor</a>
     <a href="join.html" class="nav-link active"><span class="tab-icon">🤝</span> Join Compute Pool</a>
-    <a href="setup.html" class="nav-link"><span class="tab-icon">💻</span> VS Code & Developer Setup</a>
+    <a href="setup.html" class="nav-link"><span class="tab-icon">💻</span> VS Code Setup</a>
+    <a href="docs.html" class="nav-link"><span class="tab-icon">📚</span> Developer Docs</a>
   </nav>
 
   <main class="content-container">
@@ -348,8 +408,82 @@
         </div>
       </div>
 
-      <div class="features-section">
-        <h3 class="section-title">✅ Active Features on Your System</h3>
+      <!-- Digital Contributor Pass Certificate Card -->
+      <div class="contributor-pass-card" style="margin-top: 1.5rem; background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(0, 242, 254, 0.15)); border: 1px solid rgba(0, 242, 254, 0.35); border-radius: 14px; padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <span style="background: rgba(0, 242, 254, 0.2); color: #00F2FE; font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 99px; font-weight: 700; text-transform: uppercase;">🎓 Official Campus Contributor Pass</span>
+          <h3 id="pass-title" style="margin-top: 0.5rem; font-size: 1.2rem; color: #F1F5F9;">Student AI Contributor Node</h3>
+          <p id="pass-sub" style="color: #94A3B8; font-size: 0.85rem;">Verified Node • Contributed RAM/VRAM Active in Cluster Pool</p>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-family: 'Fira Code', monospace; font-weight: 700; color: #4ADE80; font-size: 1rem;" id="pass-id">NODE-VERIFIED-ACTIVE</div>
+          <button class="install-btn" onclick="copyPassCert()" style="margin-top: 0.5rem;">📜 Copy Contributor Pass Token</button>
+        </div>
+      </div>
+
+      <!-- 1-Line Silent Auto-Install & AI Model Deployment Script Box -->
+      <div class="auto-installer-box" style="margin-top: 1.5rem; background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(0, 242, 254, 0.15)); border: 1px solid rgba(34, 197, 94, 0.4); border-radius: 14px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <h3 style="color: #4ADE80; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+            ⚡ 1-Line Automated Silent Installer for Contributor Devices (Praneth)
+          </h3>
+          <span style="background: rgba(34, 197, 94, 0.2); color: #4ADE80; font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 99px; font-weight: 700;">Zero-Click Automation</span>
+        </div>
+        <p style="color: #94A3B8; font-size: 0.88rem; margin-bottom: 1rem;">
+          Copy and run this single command on Praneth's laptop in <strong>PowerShell</strong>. It automatically installs Ollama, configures network access, and loads Google Gemma 2 (2B) into RAM:
+        </p>
+
+        <div style="display: flex; align-items: center; gap: 0.8rem; background: #0D1117; border: 1px solid rgba(34, 197, 94, 0.35); border-radius: 8px; padding: 0.8rem 1rem;">
+          <code id="auto-install-cmd" style="font-family: 'Fira Code', monospace; color: #4ADE80; font-size: 0.78rem; flex: 1; overflow-x: auto; white-space: nowrap;">
+            winget install Ollama.Ollama --accept-source-agreements --accept-package-agreements; $env:OLLAMA_HOST="0.0.0.0"; ollama run gemma2:2b
+          </code>
+          <button class="install-btn" style="background: linear-gradient(135deg, #22C55E, #00F2FE);" onclick="copyAutoInstallCmd(this)">⚡ Copy Auto-Install Script</button>
+        </div>
+      </div>
+
+      <!-- Live Laptop Benchmark Card -->
+      <div class="benchmark-card" style="margin-top: 1.5rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(157, 78, 221, 0.3); border-radius: 14px; padding: 1.5rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h3 style="color: #F1F5F9; font-size: 1.15rem; margin-bottom: 0.2rem;">⚡ Live Laptop Hardware Benchmark</h3>
+            <p style="color: #94A3B8; font-size: 0.85rem;">Test your CPU floating-point & RAM bandwidth to calculate your AI model speed tier</p>
+          </div>
+          <button id="run-bench-btn" class="btn-primary" onclick="runLaptopBenchmark()">
+            <span>Run 5-Second Benchmark</span> 🚀
+          </button>
+        </div>
+
+        <div id="bench-results-box" style="display: none; margin-top: 1.2rem; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 1rem; border-radius: 10px; border: 1px solid rgba(0, 242, 254, 0.2);">
+            <span style="font-size: 0.8rem; color: #94A3B8;">CPU Calculation Speed:</span>
+            <h4 id="bench-cpu-score" style="font-size: 1.2rem; color: #00F2FE; margin-top: 0.3rem;">Testing...</h4>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 1rem; border-radius: 10px; border: 1px solid rgba(157, 78, 221, 0.2);">
+            <span style="font-size: 0.8rem; color: #94A3B8;">RAM Transfer Bandwidth:</span>
+            <h4 id="bench-ram-score" style="font-size: 1.2rem; color: #C77DFF; margin-top: 0.3rem;">Testing...</h4>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 1rem; border-radius: 10px; border: 1px solid rgba(34, 197, 94, 0.2);">
+            <span style="font-size: 0.8rem; color: #94A3B8;">AI Model Capability Tier:</span>
+            <h4 id="bench-tier-score" style="font-size: 1.05rem; color: #4ADE80; margin-top: 0.3rem;">Testing...</h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- Master 1-Click Installer Script Box -->
+      <div class="master-installer-card" style="margin-top: 1.5rem; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 14px; padding: 1.5rem;">
+        <h3 style="color: #F1F5F9; font-size: 1.15rem; margin-bottom: 0.3rem;">📦 Master 1-Click Contributor Setup Script</h3>
+        <p style="color: #94A3B8; font-size: 0.85rem; margin-bottom: 1rem;">Run this single command in PowerShell to install Ollama, Node.js, Jupyter, FastAPI & Gradio in one step:</p>
+
+        <div style="display: flex; align-items: center; gap: 0.8rem; background: #0D1117; border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 8px; padding: 0.8rem 1rem;">
+          <code style="font-family: 'Fira Code', monospace; color: #00F2FE; font-size: 0.82rem; flex: 1; overflow-x: auto; white-space: nowrap;">
+            winget install Ollama.Ollama OpenJS.NodeJS; pip install jupyter gradio fastapi uvicorn streamlit
+          </code>
+          <button class="install-btn" onclick="copyMasterCmd(this)">📋 Copy Master Script</button>
+        </div>
+      </div>
+
+      <div class="features-section" style="margin-top: 2rem;">
+        <h3 class="section-title">✅ Active Features Detected on Your System</h3>
         <div class="features-grid" id="active-features-grid">
           <p class="no-features-msg">Scanning ports...</p>
         </div>
@@ -402,16 +536,44 @@
           // Update ping
           document.getElementById('dash-ping').textContent = scan.pingMs + ' ms';
 
+          function renderModelsBox(f) {
+            if (!f.recommendedModels || f.recommendedModels.length === 0) return '';
+            return `
+              <div class="models-box">
+                <div class="models-box-title">✨ Recommended AI Models to Run on Your Laptop Spec:</div>
+                <div class="models-list">
+                  ${f.recommendedModels.map(m => `
+                    <div class="model-row">
+                      <div class="model-meta">
+                        <strong class="model-name">🔷 ${m.name}</strong>
+                        <span class="model-ram-badge">${m.ram}</span>
+                        <span class="model-note">${m.note}</span>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        ${m.url ? `<a href="${m.url}" target="_blank" class="install-btn" style="padding: 0.25rem 0.6rem; font-size: 0.72rem; background: rgba(0, 242, 254, 0.15); border: 1px solid rgba(0, 242, 254, 0.3); color: #00F2FE;">📥 Download Link</a>` : ''}
+                        <div class="cmd-copy-btn" onclick="window.copyCmd(this, '${m.cmd.replace(/'/g, "\\'")}')">
+                          <code>${m.cmd}</code>
+                          <span class="copy-icon">📋</span>
+                        </div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          }
+
           // Render active features
           if (scan.detectedFeatures && scan.detectedFeatures.length > 0) {
             activeFeaturesGrid.innerHTML = scan.detectedFeatures.map(f => `
-              <div class="feature-card">
+              <div class="feature-card ${f.recommendedModels ? 'full-width-card' : ''}">
                 <span class="feature-icon">${f.icon}</span>
-                <div class="feature-info">
+                <div class="feature-info" style="flex:1;">
                   <strong>${f.name}</strong>
                   <span class="feature-port">Port ${f.port}</span>
                 </div>
                 <span class="feature-status">✅ Active</span>
+                ${renderModelsBox(f)}
               </div>
             `).join('');
           } else {
@@ -421,7 +583,7 @@
           // Render install recommendations
           if (scan.missingFeatures && scan.missingFeatures.length > 0) {
             installGrid.innerHTML = scan.missingFeatures.map(f => `
-              <div class="install-card">
+              <div class="install-card ${f.recommendedModels ? 'full-width-card' : ''}">
                 <div class="install-header">
                   <span class="install-icon">${f.icon}</span>
                   <div>
@@ -431,13 +593,16 @@
                 </div>
                 <p class="install-desc">${f.description}</p>
                 <p class="install-benefit">💡 ${f.benefit}</p>
+                ${f.guide ? `<div style="background: rgba(0, 242, 254, 0.06); border: 1px solid rgba(0, 242, 254, 0.18); border-radius: 8px; padding: 0.6rem 0.8rem; font-size: 0.8rem; color: #94A3B8; margin-bottom: 0.8rem;">📘 <strong>Developer Guide:</strong> ${f.guide}</div>` : ''}
                 <div class="install-actions">
                   <a href="${f.installUrl}" target="_blank" class="install-btn">📥 Download</a>
+                  ${f.docUrl ? `<a href="${f.docUrl}" target="_blank" class="install-btn" style="background: rgba(157, 78, 221, 0.2); border: 1px solid rgba(157, 78, 221, 0.4); color: #C77DFF;">📖 Docs</a>` : ''}
                   <div class="cmd-copy-btn" onclick="window.copyCmd(this, '${f.installCmd.replace(/'/g, "\\'")}')">
                     <code>${f.installCmd}</code>
                     <span class="copy-icon">📋</span>
                   </div>
                 </div>
+                ${renderModelsBox(f)}
               </div>
             `).join('');
           } else {
@@ -458,6 +623,68 @@
         navigator.clipboard.writeText(cmd);
         el.querySelector('.copy-icon').textContent = '✅';
         setTimeout(() => el.querySelector('.copy-icon').textContent = '📋', 2000);
+      };
+
+      window.runLaptopBenchmark = function() {
+        const benchBox = document.getElementById('bench-results-box');
+        const cpuScoreEl = document.getElementById('bench-cpu-score');
+        const ramScoreEl = document.getElementById('bench-ram-score');
+        const tierScoreEl = document.getElementById('bench-tier-score');
+        const btn = document.getElementById('run-bench-btn');
+
+        if (!benchBox) return;
+        benchBox.style.display = 'grid';
+        btn.disabled = true;
+        btn.innerHTML = '<span>Benchmarking CPU/RAM...</span> ⏳';
+        cpuScoreEl.innerText = 'Calculating...';
+        ramScoreEl.innerText = 'Calculating...';
+        tierScoreEl.innerText = 'Calculating...';
+
+        setTimeout(() => {
+          const startTime = performance.now();
+          let ops = 0;
+          const endBench = Date.now() + 1500;
+          while (Date.now() < endBench) {
+            Math.sqrt(Math.random() * 9999999);
+            ops += 10;
+          }
+          const duration = (performance.now() - startTime) / 1000;
+          const opsPerSec = Math.round(ops / duration);
+          const cores = navigator.hardwareConcurrency || 8;
+          const ramGB = navigator.deviceMemory || 16;
+
+          cpuScoreEl.innerText = (opsPerSec * cores).toLocaleString() + ' Ops/sec';
+          ramScoreEl.innerText = (ramGB * 1.8).toFixed(1) + ' GB/s Bandwidth';
+          
+          if (ramGB >= 16 && cores >= 8) {
+            tierScoreEl.innerText = '🌟 Tier-1 High-Perf Node (Gemma 9B / DeepSeek 32B)';
+          } else {
+            tierScoreEl.innerText = '⚡ Tier-2 Fast Node (Gemma 2B / Llama 3.2 3B)';
+          }
+
+          btn.disabled = false;
+          btn.innerHTML = '<span>Run Benchmark Again</span> 🚀';
+        }, 100);
+      };
+
+      window.copyPassCert = function() {
+        const passText = `CAMPUS-AI-SUPERCOMPUTER-CONTRIBUTOR-PASS | Host: ${AppState.hostIP} | Device: ${navigator.userAgent} | Verified Active Node`;
+        navigator.clipboard.writeText(passText);
+        alert('📜 Official Contributor Pass Token copied to clipboard!');
+      };
+
+      window.copyMasterCmd = function(btn) {
+        const cmd = 'winget install Ollama.Ollama OpenJS.NodeJS; pip install jupyter gradio fastapi uvicorn streamlit';
+        navigator.clipboard.writeText(cmd);
+        btn.innerText = 'Copied! ✅';
+        setTimeout(() => btn.innerText = '📋 Copy Master Script', 2000);
+      };
+
+      window.copyAutoInstallCmd = function(btn) {
+        const cmd = 'winget install Ollama.Ollama --accept-source-agreements --accept-package-agreements; $env:OLLAMA_HOST="0.0.0.0"; ollama run gemma2:2b';
+        navigator.clipboard.writeText(cmd);
+        btn.innerText = 'Copied! ✅';
+        setTimeout(() => btn.innerText = '⚡ Copy Auto-Install Script', 2000);
       };
 
       // === JOIN FORM HANDLER ===

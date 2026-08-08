@@ -37,6 +37,9 @@ function saveRegisteredNodes() {
 }
 
 let totalRequestsProcessed = 0;
+
+// Live contributor usage reports: { ip: { cpuPercent, usedRAMGB, ramUsagePercent, lastReportedAt } }
+const liveUsageMap = new Map();
 let lastCpuMeasure = getCpuTimes();
 
 let realWifiDetails = {
@@ -201,7 +204,18 @@ function scanRealArpDevices() {
       latencyMs: 1
     });
 
+    const activeArpIPs = new Set();
+    if (stdout) {
+      const lines = stdout.split('\n');
+      for (const line of lines) {
+        const match = line.trim().match(/^(172\.16\.\d+\.\d+|192\.168\.\d+\.\d+)\s+/i);
+        if (match) activeArpIPs.add(match[1]);
+      }
+    }
+
     registeredNodes.forEach(rn => {
+      const isOnline = (rn.ip === hostIP || activeArpIPs.has(rn.ip));
+      rn.status = isOnline ? 'Online' : 'Offline';
       if (!nodes.some(n => n.ip === rn.ip || n.name === rn.name)) {
         nodes.push(rn);
       }
@@ -245,22 +259,69 @@ setInterval(scanRealArpDevices, 3000);
 
 function broadcastRealtimeState() {
   const sys = getRealSystemSpecs();
-  const totalRAM = realDiscoveredNodes.reduce((acc, n) => acc + (n.ramGB || 16), 0);
-  const totalVRAM = realDiscoveredNodes.reduce((acc, n) => acc + (n.vramGB || 4), 0);
+  const hostIP = getPrimaryHostIP();
+  
+  // Mark contributors as offline if they haven't reported in 30 seconds
+  const staleThreshold = 30000;
+  registeredNodes.forEach(n => {
+    const usage = liveUsageMap.get(n.ip);
+    if (n.ip !== hostIP && usage && (Date.now() - usage.lastReportedAt) > staleThreshold) {
+      liveUsageMap.delete(n.ip);
+    }
+  });
 
-  const backupLeader = realDiscoveredNodes.find(n => n.ip !== getPrimaryHostIP() && n.role !== 'Subnet Gateway');
+  const onlineContributors = registeredNodes.filter(n => n.status === 'Online');
+  const allContributors = registeredNodes;
+
+  const onlineContributorRAM = onlineContributors.reduce((acc, n) => acc + (parseInt(n.ramGB) || 16), 0);
+  const onlineContributorVRAM = onlineContributors.reduce((acc, n) => acc + (parseInt(n.vramGB) || 4), 0);
+
+  const totalContributorRAM = allContributors.reduce((acc, n) => acc + (parseInt(n.ramGB) || 16), 0);
+  const totalContributorVRAM = allContributors.reduce((acc, n) => acc + (parseInt(n.vramGB) || 4), 0);
+
+  // Calculate real total used RAM from live reports
+  let totalUsedRAM = sys.usedRAMGB;
+  onlineContributors.forEach(n => {
+    if (n.ip !== hostIP) {
+      const usage = liveUsageMap.get(n.ip);
+      totalUsedRAM += usage ? usage.usedRAMGB : 0;
+    }
+  });
+
+  // Attach live usage per contributor for frontend rendering
+  const contributorsWithUsage = registeredNodes.map(n => {
+    const isHost = (n.ip === hostIP);
+    const usage = liveUsageMap.get(n.ip);
+    return {
+      ...n,
+      liveUsage: isHost 
+        ? { cpuPercent: sys.cpuUsagePercent, usedRAMGB: sys.usedRAMGB, ramUsagePercent: sys.ramUsagePercent, isLive: true }
+        : usage 
+          ? { cpuPercent: usage.cpuPercent, usedRAMGB: usage.usedRAMGB, ramUsagePercent: usage.ramUsagePercent, isLive: true }
+          : { cpuPercent: 0, usedRAMGB: 0, ramUsagePercent: 0, isLive: false }
+    };
+  });
+
+  const backupLeader = realDiscoveredNodes.find(n => n.ip !== hostIP && n.role !== 'Subnet Gateway');
+  const activeLlmNode = realDiscoveredNodes.find(n => n.hasActiveLlm);
 
   const payload = JSON.stringify({
     type: 'REALTIME_UPDATE',
-    hostIP: getPrimaryHostIP(),
+    hostIP,
     sys,
     nodes: realDiscoveredNodes,
-    registeredContributors: registeredNodes,
+    registeredContributors: contributorsWithUsage,
     backupLeaderIP: backupLeader ? backupLeader.ip : '172.16.108.6',
+    activeLlmNode: activeLlmNode ? { name: activeLlmNode.name, ip: activeLlmNode.ip } : null,
+    isRealLlmActive: !!activeLlmNode,
     totals: {
-      activeCount: realDiscoveredNodes.length,
-      totalRAM: Math.round(totalRAM),
-      totalVRAM: Math.round(totalVRAM)
+      activeCount: onlineContributors.length,
+      totalContributorsCount: allContributors.length,
+      pooledContributorRAM: Math.round(onlineContributorRAM),
+      pooledContributorVRAM: Math.round(onlineContributorVRAM),
+      totalContributorRAM: Math.round(totalContributorRAM),
+      totalContributorVRAM: Math.round(totalContributorVRAM),
+      totalUsedRAM: Math.round(totalUsedRAM * 10) / 10
     },
     models: AVAILABLE_MODELS,
     totalRequestsProcessed
@@ -279,11 +340,13 @@ async function processRealPrompt(prompt, model) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: model || 'gemma2:2b', prompt: prompt, stream: false }),
-      signal: AbortSignal.timeout(800)
+      signal: AbortSignal.timeout(1000)
     });
     if (oRes.ok) {
       const oData = await oRes.json();
-      if (oData.response && oData.response.trim().length > 0) return oData.response;
+      if (oData.response && oData.response.trim().length > 0) {
+        return `[⚡ 100% REAL NEURAL WEIGHTS — Ollama / Python Local Server (127.0.0.1:11434)]\n\n${oData.response}`;
+      }
     }
   } catch (e) {}
 
@@ -294,19 +357,20 @@ async function processRealPrompt(prompt, model) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ model: model || 'gemma2:2b', prompt: prompt, stream: false }),
-          signal: AbortSignal.timeout(1200)
+          signal: AbortSignal.timeout(1500)
         });
         if (peerRes.ok) {
           const pData = await peerRes.json();
           if (pData.response && pData.response.trim().length > 0) {
-            return `[Generated via Failover Worker Node: ${node.name} (${node.ip})]\n\n${pData.response}`;
+            return `[⚡ 100% REAL NEURAL WEIGHTS — Failover Worker Node: ${node.name} (${node.ip})]\n\n${pData.response}`;
           }
         }
       } catch (err) {}
     }
   }
 
-  return generateIntelligentAnswer(prompt, model);
+  const fallbackAnswer = generateIntelligentAnswer(prompt, model);
+  return `[ℹ️ Campus AI Local Engine]\n\n${fallbackAnswer}\n\n---\n> [!TIP]\n> **To run 100% Real Neural Network Weights on your CPU/RAM**:\n> Open Terminal and run: \`python llm_server.py\` or \`ollama run gemma2:2b\`. The portal will automatically route all responses to neural weights!`;
 }
 
 function generateIntelligentAnswer(prompt, model) {
@@ -318,11 +382,11 @@ function generateIntelligentAnswer(prompt, model) {
   if (p === 'hi' || p === 'hello' || p === 'hey' || p.startsWith('hi ') || p.startsWith('hello ')) {
     return `Hello! 👋 I am **Campus AI** running the **${modelName}** model locally on network **${sys.wifi.ssid}** (${sys.wifi.speedMbps} Mbps).
 
-Created by **Nandhakumar Murugan** for students at KGiSL Educational Institutions (\`kgisledu.com\`).
+Created by **Nandhakumar M.** (Head of KGiSL Campus Google Community • Google Student Ambassador, 3rd Year B.E. CSE - Cyber Security) at **KGiSL Institute of Technology (KGiSL ITech)**.
 
 How can I help you today?
 - 🐍 Write Python, C++, Java, or Web code
-- 🧠 Explain Artificial Intelligence, Algorithms, or Data Structures
+- 🛡️ Cybersecurity, AI Safety, & Neural Network logic
 - 💻 Set up VS Code to use this AI for free`;
   }
 
@@ -438,17 +502,103 @@ function pingDevice(ip) {
 }
 
 const SCANNABLE_SERVICES = [
-  { name: 'Ollama (Local LLM)', port: 11434, icon: '🤖', description: 'Run AI models locally on GPU', installUrl: 'https://ollama.com/download', installCmd: 'winget install Ollama.Ollama', benefit: 'Your GPU can run AI models 5x faster than CPU!' },
-  { name: 'Node.js Server', port: 3000, icon: '🟢', description: 'Run campus backup server', installUrl: 'https://nodejs.org', installCmd: 'winget install OpenJS.NodeJS', benefit: 'Become a backup server node for 24/7 uptime' },
-  { name: 'Jupyter Notebook', port: 8888, icon: '📓', description: 'Shared GPU notebook for ML', installUrl: 'https://jupyter.org/install', installCmd: 'pip install jupyter', benefit: 'Share GPU-powered notebooks with classmates' },
-  { name: 'Gradio', port: 7860, icon: '🎨', description: 'Build AI web apps instantly', installUrl: 'https://gradio.app', installCmd: 'pip install gradio', benefit: 'Create AI demos in 5 lines of Python' },
-  { name: 'Streamlit', port: 8501, icon: '📊', description: 'Data science dashboards', installUrl: 'https://streamlit.io', installCmd: 'pip install streamlit', benefit: 'Build interactive ML dashboards' },
-  { name: 'Python API (Flask)', port: 5000, icon: '🐍', description: 'Python REST API server', installUrl: 'https://flask.palletsprojects.com', installCmd: 'pip install flask', benefit: 'Serve custom ML models via API' },
-  { name: 'Python API (FastAPI)', port: 8000, icon: '⚡', description: 'High-performance Python API', installUrl: 'https://fastapi.tiangolo.com', installCmd: 'pip install fastapi uvicorn', benefit: 'Async Python API for real-time AI' },
-  { name: 'SMB File Sharing', port: 445, icon: '📁', description: 'Windows file sharing enabled', installUrl: '', installCmd: '', benefit: 'Share datasets and models across campus' },
-  { name: 'NetBIOS', port: 139, icon: '🔗', description: 'Network discovery enabled', installUrl: '', installCmd: '', benefit: 'Device is discoverable on campus network' },
-  { name: 'Remote Desktop (RDP)', port: 3389, icon: '🖥️', description: 'Remote desktop access', installUrl: '', installCmd: '', benefit: 'Remote control for GPU compute tasks' },
-  { name: 'SSH Server', port: 22, icon: '🔐', description: 'Secure shell access', installUrl: 'https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse', installCmd: 'Add-WindowsCapability -Online -Name OpenSSH.Server', benefit: 'Remote terminal access for automation' }
+  {
+    name: 'Ollama (Local LLM)',
+    port: 11434,
+    icon: '🤖',
+    description: 'Run AI models locally on GPU or CPU/RAM',
+    installUrl: 'https://ollama.com/download',
+    docUrl: 'https://github.com/ollama/ollama/tree/main/docs',
+    installCmd: 'winget install Ollama.Ollama',
+    benefit: 'Run 100% private neural network models offline on your laptop!',
+    guide: 'Ollama allows your laptop to run open-weight AI models (Google Gemma 2, Llama 3.2, DeepSeek-R1) offline locally on CPU/RAM or GPU. Once installed, running `ollama run gemma2:2b` streams responses to the campus AI studio.',
+    recommendedModels: [
+      { name: 'Google Gemma 2 (2B)', cmd: 'ollama run gemma2:2b', url: 'https://ollama.com/library/gemma2', ram: '1.6 GB RAM', note: 'Fast & Lightweight for Intel/AMD CPU or GPU' },
+      { name: 'Meta Llama 3.2 (3B)', cmd: 'ollama run llama3.2:3b', url: 'https://ollama.com/library/llama3.2', ram: '2.0 GB RAM', note: 'General QA, Math & Multi-Turn Chat' },
+      { name: 'Qwen 2.5 Coder (1.5B)', cmd: 'ollama run qwen2.5-coder:1.5b', url: 'https://ollama.com/library/qwen2.5-coder', ram: '1.0 GB RAM', note: 'Ultra-Fast Python, C++, Java & Web Code' },
+      { name: 'DeepSeek-R1 Distill (1.5B)', cmd: 'ollama run deepseek-r1:1.5b', url: 'https://ollama.com/library/deepseek-r1', ram: '1.1 GB RAM', note: 'Deep Reasoning & Logic Chain-of-Thought' }
+    ]
+  },
+  { 
+    name: 'Node.js Server', 
+    port: 3000, 
+    icon: '🟢', 
+    description: 'Run campus backup server', 
+    installUrl: 'https://nodejs.org', 
+    docUrl: 'https://nodejs.org/en/docs',
+    installCmd: 'winget install OpenJS.NodeJS', 
+    benefit: 'Become a backup server node for 24/7 campus uptime',
+    guide: 'Node.js powers the campus supercomputer portal server and WebSocket relay. Installing Node.js lets your device act as a redundant backup portal server if the main host goes offline.'
+  },
+  { 
+    name: 'Jupyter Notebook', 
+    port: 8888, 
+    icon: '📓', 
+    description: 'Shared GPU notebook for ML', 
+    installUrl: 'https://jupyter.org/install', 
+    docUrl: 'https://docs.jupyter.org',
+    installCmd: 'pip install jupyter', 
+    benefit: 'Share GPU-powered notebooks with classmates',
+    guide: 'Jupyter Notebook gives you an interactive browser environment for Python, PyTorch, and Data Science. Running Jupyter allows you to share live code notebooks with classmates over the intranet.'
+  },
+  { 
+    name: 'Gradio', 
+    port: 7860, 
+    icon: '🎨', 
+    description: 'Build AI web apps instantly', 
+    installUrl: 'https://gradio.app', 
+    docUrl: 'https://www.gradio.app/docs/',
+    installCmd: 'pip install gradio', 
+    benefit: 'Create AI web demos in 5 lines of Python',
+    guide: 'Gradio lets you quickly create user interfaces for machine learning models and Python functions. Classmates on the campus Wi-Fi can open your Gradio web app port (7860) directly in their browsers.'
+  },
+  { 
+    name: 'Streamlit', 
+    port: 8501, 
+    icon: '📊', 
+    description: 'Data science dashboards', 
+    installUrl: 'https://streamlit.io', 
+    docUrl: 'https://docs.streamlit.io/',
+    installCmd: 'pip install streamlit', 
+    benefit: 'Build interactive ML dashboards',
+    guide: 'Streamlit turns Python data scripts into interactive dashboards. Running Streamlit on port 8501 shares interactive AI visualizations across the intranet.'
+  },
+  { 
+    name: 'Python API (Flask)', 
+    port: 5000, 
+    icon: '🐍', 
+    description: 'Python REST API server', 
+    installUrl: 'https://flask.palletsprojects.com', 
+    docUrl: 'https://flask.palletsprojects.com/en/latest/quickstart/',
+    installCmd: 'pip install flask', 
+    benefit: 'Serve custom ML models via API',
+    guide: 'Flask is a lightweight Python web framework. It lets you write custom microservices and REST endpoints to serve AI predictions across the campus network.'
+  },
+  { 
+    name: 'Python API (FastAPI)', 
+    port: 8000, 
+    icon: '⚡', 
+    description: 'High-performance Python API', 
+    installUrl: 'https://fastapi.tiangolo.com', 
+    docUrl: 'https://fastapi.tiangolo.com/tutorial/',
+    installCmd: 'pip install fastapi uvicorn', 
+    benefit: 'Async Python API for real-time AI',
+    guide: 'FastAPI is an async, high-performance Python framework. Perfect for building ultra-fast AI inference APIs with automatic Swagger documentation.'
+  },
+  { name: 'SMB File Sharing', port: 445, icon: '📁', description: 'Windows file sharing enabled', installUrl: '', docUrl: 'https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-smb-overview', installCmd: '', benefit: 'Share datasets and models across campus', guide: 'Windows SMB file sharing allows fast 500+ Mbps file transfers over Wi-Fi without using mobile internet data.' },
+  { name: 'NetBIOS', port: 139, icon: '🔗', description: 'Network discovery enabled', installUrl: '', docUrl: '', installCmd: '', benefit: 'Device is discoverable on campus network', guide: 'NetBIOS network discovery allows student devices on the same subnet to resolve hostnames automatically.' },
+  { name: 'Remote Desktop (RDP)', port: 3389, icon: '🖥️', description: 'Remote desktop access', installUrl: '', docUrl: 'https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/welcome-to-rds', installCmd: '', benefit: 'Remote control for GPU compute tasks', guide: 'Remote Desktop allows remote control of Windows workstations to monitor compute workloads.' },
+  { 
+    name: 'SSH Server', 
+    port: 22, 
+    icon: '🔐', 
+    description: 'Secure shell access', 
+    installUrl: 'https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse', 
+    docUrl: 'https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse',
+    installCmd: 'Add-WindowsCapability -Online -Name OpenSSH.Server', 
+    benefit: 'Remote terminal access for automation',
+    guide: 'OpenSSH Server enables secure encrypted terminal access for remote cluster orchestration and automated model deployment.'
+  }
 ];
 
 async function scanDevicePorts(ip) {
@@ -459,7 +609,7 @@ async function scanDevicePorts(ip) {
   const scanPromises = SCANNABLE_SERVICES.map(async (svc) => {
     const isOpen = await scanPort(ip, svc.port, 600);
     if (isOpen) {
-      detectedFeatures.push({ name: svc.name, port: svc.port, status: 'active', icon: svc.icon });
+      detectedFeatures.push({ ...svc, status: 'active' });
     } else if (svc.installUrl) {
       missingFeatures.push({ ...svc, status: 'not_found' });
     }
@@ -547,6 +697,31 @@ app.post('/api/cluster/join', async (req, res) => {
   }).catch(() => {});
 
   res.json({ success: true, node: newNode, message: 'Laptop registered into campus cluster!' });
+});
+
+// Live usage reporting endpoint — contributor devices POST their stats every 5s
+app.post('/api/report-usage', (req, res) => {
+  const clientIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress.replace('::ffff:', '');
+  const { cpuPercent, usedRAMGB, totalRAMGB, ramUsagePercent, hostname } = req.body;
+
+  liveUsageMap.set(clientIP, {
+    cpuPercent: parseFloat(cpuPercent) || 0,
+    usedRAMGB: parseFloat(usedRAMGB) || 0,
+    totalRAMGB: parseFloat(totalRAMGB) || 0,
+    ramUsagePercent: parseFloat(ramUsagePercent) || 0,
+    hostname: hostname || '',
+    lastReportedAt: Date.now()
+  });
+
+  // Also mark this contributor as online if registered
+  const contributor = registeredNodes.find(n => n.ip === clientIP);
+  if (contributor && contributor.status !== 'Online') {
+    contributor.status = 'Online';
+    saveRegisteredNodes();
+  }
+
+  broadcastRealtimeState();
+  res.json({ ok: true });
 });
 
 app.get('/v1/models', (req, res) => {

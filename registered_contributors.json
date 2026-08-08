@@ -6,44 +6,218 @@
     "type": "Dedicated Gaming Laptop (NVIDIA RTX)",
     "ramGB": 16,
     "vramGB": 6,
-    "status": "Online",
+    "status": "Offline",
     "role": "Contributor Student Node",
     "hasActiveLlm": false,
     "latencyMs": 4
   },
   {
     "id": "node-1786008491653",
-    "name": "Windows Laptop Node (12 Cores)",
-    "ip": "172.16.49.168",
-    "type": "Windows Laptop Node (12 CPU / 16GB RAM)",
-    "ramGB": 16,
+    "name": "Anush",
+    "ip": "172.16.206.246",
+    "type": "Standard Student Laptop",
+    "ramGB": 8,
     "vramGB": 4,
-    "status": "Online",
+    "status": "Offline",
     "role": "Contributor Student Node",
     "hasActiveLlm": false,
-    "latencyMs": 3,
+    "latencyMs": 4,
     "scanResults": {
-      "ip": "172.16.49.168",
-      "pingMs": 1,
+      "ip": "172.16.206.246",
+      "pingMs": 0,
+      "reachable": false,
+      "detectedFeatures": [
+        {
+          "name": "NetBIOS",
+          "port": 139,
+          "icon": "🔗",
+          "description": "Network discovery enabled",
+          "installUrl": "",
+          "docUrl": "",
+          "installCmd": "",
+          "benefit": "Device is discoverable on campus network",
+          "guide": "NetBIOS network discovery allows student devices on the same subnet to resolve hostnames automatically.",
+          "status": "active"
+        },
+        {
+          "name": "SMB File Sharing",
+          "port": 445,
+          "icon": "📁",
+          "description": "Windows file sharing enabled",
+          "installUrl": "",
+          "docUrl": "https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-smb-overview",
+          "installCmd": "",
+          "benefit": "Share datasets and models across campus",
+          "guide": "Windows SMB file sharing allows fast 500+ Mbps file transfers over Wi-Fi without using mobile internet data.",
+          "status": "active"
+        }
+      ],
+      "missingFeatures": [
+        {
+          "name": "SSH Server",
+          "port": 22,
+          "icon": "🔐",
+          "description": "Secure shell access",
+          "installUrl": "https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse",
+          "docUrl": "https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse",
+          "installCmd": "Add-WindowsCapability -Online -Name OpenSSH.Server",
+          "benefit": "Remote terminal access for automation",
+          "guide": "OpenSSH Server enables secure encrypted terminal access for remote cluster orchestration and automated model deployment.",
+          "status": "not_found"
+        },
+        {
+          "name": "Node.js Server",
+          "port": 3000,
+          "icon": "🟢",
+          "description": "Run campus backup server",
+          "installUrl": "https://nodejs.org",
+          "docUrl": "https://nodejs.org/en/docs",
+          "installCmd": "winget install OpenJS.NodeJS",
+          "benefit": "Become a backup server node for 24/7 campus uptime",
+          "guide": "Node.js powers the campus supercomputer portal server and WebSocket relay. Installing Node.js lets your device act as a redundant backup portal server if the main host goes offline.",
+          "status": "not_found"
+        },
+        {
+          "name": "Python API (Flask)",
+          "port": 5000,
+          "icon": "🐍",
+          "description": "Python REST API server",
+          "installUrl": "https://flask.palletsprojects.com",
+          "docUrl": "https://flask.palletsprojects.com/en/latest/quickstart/",
+          "installCmd": "pip install flask",
+          "benefit": "Serve custom ML models via API",
+          "guide": "Flask is a lightweight Python web framework. It lets you write custom microservices and REST endpoints to serve AI predictions across the campus network.",
+          "status": "not_found"
+        },
+        {
+          "name": "Gradio",
+          "port": 7860,
+          "icon": "🎨",
+          "description": "Build AI web apps instantly",
+          "installUrl": "https://gradio.app",
+          "docUrl": "https://www.gradio.app/docs/",
+          "installCmd": "pip install gradio",
+          "benefit": "Create AI web demos in 5 lines of Python",
+          "guide": "Gradio lets you quickly create user interfaces for machine learning models and Python functions. Classmates on the campus Wi-Fi can open your Gradio web app port (7860) directly in their browsers.",
+          "status": "not_found"
+        },
+        {
+          "name": "Python API (FastAPI)",
+          "port": 8000,
+          "icon": "⚡",
+          "description": "High-performance Python API",
+          "installUrl": "https://fastapi.tiangolo.com",
+          "docUrl": "https://fastapi.tiangolo.com/tutorial/",
+          "installCmd": "pip install fastapi uvicorn",
+          "benefit": "Async Python API for real-time AI",
+          "guide": "FastAPI is an async, high-performance Python framework. Perfect for building ultra-fast AI inference APIs with automatic Swagger documentation.",
+          "status": "not_found"
+        },
+        {
+          "name": "Streamlit",
+          "port": 8501,
+          "icon": "📊",
+          "description": "Data science dashboards",
+          "installUrl": "https://streamlit.io",
+          "docUrl": "https://docs.streamlit.io/",
+          "installCmd": "pip install streamlit",
+          "benefit": "Build interactive ML dashboards",
+          "guide": "Streamlit turns Python data scripts into interactive dashboards. Running Streamlit on port 8501 shares interactive AI visualizations across the intranet.",
+          "status": "not_found"
+        },
+        {
+          "name": "Jupyter Notebook",
+          "port": 8888,
+          "icon": "📓",
+          "description": "Shared GPU notebook for ML",
+          "installUrl": "https://jupyter.org/install",
+          "docUrl": "https://docs.jupyter.org",
+          "installCmd": "pip install jupyter",
+          "benefit": "Share GPU-powered notebooks with classmates",
+          "guide": "Jupyter Notebook gives you an interactive browser environment for Python, PyTorch, and Data Science. Running Jupyter allows you to share live code notebooks with classmates over the intranet.",
+          "status": "not_found"
+        },
+        {
+          "name": "Ollama (Local LLM)",
+          "port": 11434,
+          "icon": "🤖",
+          "description": "Run AI models locally on GPU or CPU/RAM",
+          "installUrl": "https://ollama.com/download",
+          "docUrl": "https://github.com/ollama/ollama/tree/main/docs",
+          "installCmd": "winget install Ollama.Ollama",
+          "benefit": "Run 100% private neural network models offline on your laptop!",
+          "guide": "Ollama allows your laptop to run open-weight AI models (Google Gemma 2, Llama 3.2, DeepSeek-R1) offline locally on CPU/RAM or GPU. Once installed, running `ollama run gemma2:2b` streams responses to the campus AI studio.",
+          "recommendedModels": [
+            {
+              "name": "Google Gemma 2 (2B)",
+              "cmd": "ollama run gemma2:2b",
+              "url": "https://ollama.com/library/gemma2",
+              "ram": "1.6 GB RAM",
+              "note": "Fast & Lightweight for Intel/AMD CPU or GPU"
+            },
+            {
+              "name": "Meta Llama 3.2 (3B)",
+              "cmd": "ollama run llama3.2:3b",
+              "url": "https://ollama.com/library/llama3.2",
+              "ram": "2.0 GB RAM",
+              "note": "General QA, Math & Multi-Turn Chat"
+            },
+            {
+              "name": "Qwen 2.5 Coder (1.5B)",
+              "cmd": "ollama run qwen2.5-coder:1.5b",
+              "url": "https://ollama.com/library/qwen2.5-coder",
+              "ram": "1.0 GB RAM",
+              "note": "Ultra-Fast Python, C++, Java & Web Code"
+            },
+            {
+              "name": "DeepSeek-R1 Distill (1.5B)",
+              "cmd": "ollama run deepseek-r1:1.5b",
+              "url": "https://ollama.com/library/deepseek-r1",
+              "ram": "1.1 GB RAM",
+              "note": "Deep Reasoning & Logic Chain-of-Thought"
+            }
+          ],
+          "status": "not_found"
+        }
+      ],
+      "scannedAt": "2026-08-07T08:57:10.978Z"
+    }
+  },
+  {
+    "id": "node-1786089703276",
+    "name": "praneth",
+    "ip": "172.16.207.36",
+    "type": "Standard Student Laptop",
+    "ramGB": 16,
+    "vramGB": 8,
+    "status": "Offline",
+    "role": "Contributor Student Node",
+    "hasActiveLlm": false,
+    "latencyMs": 4,
+    "scanResults": {
+      "ip": "172.16.207.36",
+      "pingMs": 104,
       "reachable": true,
       "detectedFeatures": [
         {
           "name": "NetBIOS",
           "port": 139,
-          "status": "active",
-          "icon": "🔗"
+          "icon": "🔗",
+          "description": "Network discovery enabled",
+          "installUrl": "",
+          "installCmd": "",
+          "benefit": "Device is discoverable on campus network",
+          "status": "active"
         },
         {
           "name": "SMB File Sharing",
           "port": 445,
-          "status": "active",
-          "icon": "📁"
-        },
-        {
-          "name": "Node.js Server",
-          "port": 3000,
-          "status": "active",
-          "icon": "🟢"
+          "icon": "📁",
+          "description": "Windows file sharing enabled",
+          "installUrl": "",
+          "installCmd": "",
+          "benefit": "Share datasets and models across campus",
+          "status": "active"
         }
       ],
       "missingFeatures": [
@@ -55,6 +229,16 @@
           "installUrl": "https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse",
           "installCmd": "Add-WindowsCapability -Online -Name OpenSSH.Server",
           "benefit": "Remote terminal access for automation",
+          "status": "not_found"
+        },
+        {
+          "name": "Node.js Server",
+          "port": 3000,
+          "icon": "🟢",
+          "description": "Run campus backup server",
+          "installUrl": "https://nodejs.org",
+          "installCmd": "winget install OpenJS.NodeJS",
+          "benefit": "Become a backup server node for 24/7 uptime",
           "status": "not_found"
         },
         {
@@ -111,14 +295,359 @@
           "name": "Ollama (Local LLM)",
           "port": 11434,
           "icon": "🤖",
-          "description": "Run AI models locally on GPU",
+          "description": "Run AI models locally on GPU or CPU/RAM",
           "installUrl": "https://ollama.com/download",
           "installCmd": "winget install Ollama.Ollama",
-          "benefit": "Your GPU can run AI models 5x faster than CPU!",
+          "benefit": "Run 100% private neural network models offline on your laptop!",
+          "recommendedModels": [
+            {
+              "name": "Google Gemma 2 (2B)",
+              "cmd": "ollama run gemma2:2b",
+              "ram": "1.6 GB RAM",
+              "note": "Fast & Lightweight for Intel/AMD CPU or GPU"
+            },
+            {
+              "name": "Meta Llama 3.2 (3B)",
+              "cmd": "ollama run llama3.2:3b",
+              "ram": "2.0 GB RAM",
+              "note": "General QA, Math & Multi-Turn Chat"
+            },
+            {
+              "name": "Qwen 2.5 Coder (1.5B)",
+              "cmd": "ollama run qwen2.5-coder:1.5b",
+              "ram": "1.0 GB RAM",
+              "note": "Ultra-Fast Python, C++, Java & Web Code"
+            },
+            {
+              "name": "DeepSeek-R1 Distill (1.5B)",
+              "cmd": "ollama run deepseek-r1:1.5b",
+              "ram": "1.1 GB RAM",
+              "note": "Deep Reasoning & Logic Chain-of-Thought"
+            }
+          ],
           "status": "not_found"
         }
       ],
-      "scannedAt": "2026-08-07T03:35:52.400Z"
+      "scannedAt": "2026-08-07T08:01:44.064Z"
+    }
+  },
+  {
+    "id": "node-1786093037832",
+    "name": "Windows Laptop Node (12 Cores)",
+    "ip": "172.16.110.12",
+    "type": "Windows Laptop Node (12 CPU / 16GB RAM)",
+    "ramGB": 16,
+    "vramGB": 4,
+    "status": "Online",
+    "role": "Contributor Student Node",
+    "hasActiveLlm": false,
+    "latencyMs": 4,
+    "scanResults": {
+      "ip": "172.16.110.12",
+      "pingMs": 1,
+      "reachable": true,
+      "detectedFeatures": [
+        {
+          "name": "NetBIOS",
+          "port": 139,
+          "icon": "🔗",
+          "description": "Network discovery enabled",
+          "installUrl": "",
+          "docUrl": "",
+          "installCmd": "",
+          "benefit": "Device is discoverable on campus network",
+          "guide": "NetBIOS network discovery allows student devices on the same subnet to resolve hostnames automatically.",
+          "status": "active"
+        },
+        {
+          "name": "SMB File Sharing",
+          "port": 445,
+          "icon": "📁",
+          "description": "Windows file sharing enabled",
+          "installUrl": "",
+          "docUrl": "https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-smb-overview",
+          "installCmd": "",
+          "benefit": "Share datasets and models across campus",
+          "guide": "Windows SMB file sharing allows fast 500+ Mbps file transfers over Wi-Fi without using mobile internet data.",
+          "status": "active"
+        },
+        {
+          "name": "Node.js Server",
+          "port": 3000,
+          "icon": "🟢",
+          "description": "Run campus backup server",
+          "installUrl": "https://nodejs.org",
+          "docUrl": "https://nodejs.org/en/docs",
+          "installCmd": "winget install OpenJS.NodeJS",
+          "benefit": "Become a backup server node for 24/7 campus uptime",
+          "guide": "Node.js powers the campus supercomputer portal server and WebSocket relay. Installing Node.js lets your device act as a redundant backup portal server if the main host goes offline.",
+          "status": "active"
+        }
+      ],
+      "missingFeatures": [
+        {
+          "name": "SSH Server",
+          "port": 22,
+          "icon": "🔐",
+          "description": "Secure shell access",
+          "installUrl": "https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse",
+          "docUrl": "https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse",
+          "installCmd": "Add-WindowsCapability -Online -Name OpenSSH.Server",
+          "benefit": "Remote terminal access for automation",
+          "guide": "OpenSSH Server enables secure encrypted terminal access for remote cluster orchestration and automated model deployment.",
+          "status": "not_found"
+        },
+        {
+          "name": "Python API (Flask)",
+          "port": 5000,
+          "icon": "🐍",
+          "description": "Python REST API server",
+          "installUrl": "https://flask.palletsprojects.com",
+          "docUrl": "https://flask.palletsprojects.com/en/latest/quickstart/",
+          "installCmd": "pip install flask",
+          "benefit": "Serve custom ML models via API",
+          "guide": "Flask is a lightweight Python web framework. It lets you write custom microservices and REST endpoints to serve AI predictions across the campus network.",
+          "status": "not_found"
+        },
+        {
+          "name": "Gradio",
+          "port": 7860,
+          "icon": "🎨",
+          "description": "Build AI web apps instantly",
+          "installUrl": "https://gradio.app",
+          "docUrl": "https://www.gradio.app/docs/",
+          "installCmd": "pip install gradio",
+          "benefit": "Create AI web demos in 5 lines of Python",
+          "guide": "Gradio lets you quickly create user interfaces for machine learning models and Python functions. Classmates on the campus Wi-Fi can open your Gradio web app port (7860) directly in their browsers.",
+          "status": "not_found"
+        },
+        {
+          "name": "Python API (FastAPI)",
+          "port": 8000,
+          "icon": "⚡",
+          "description": "High-performance Python API",
+          "installUrl": "https://fastapi.tiangolo.com",
+          "docUrl": "https://fastapi.tiangolo.com/tutorial/",
+          "installCmd": "pip install fastapi uvicorn",
+          "benefit": "Async Python API for real-time AI",
+          "guide": "FastAPI is an async, high-performance Python framework. Perfect for building ultra-fast AI inference APIs with automatic Swagger documentation.",
+          "status": "not_found"
+        },
+        {
+          "name": "Streamlit",
+          "port": 8501,
+          "icon": "📊",
+          "description": "Data science dashboards",
+          "installUrl": "https://streamlit.io",
+          "docUrl": "https://docs.streamlit.io/",
+          "installCmd": "pip install streamlit",
+          "benefit": "Build interactive ML dashboards",
+          "guide": "Streamlit turns Python data scripts into interactive dashboards. Running Streamlit on port 8501 shares interactive AI visualizations across the intranet.",
+          "status": "not_found"
+        },
+        {
+          "name": "Jupyter Notebook",
+          "port": 8888,
+          "icon": "📓",
+          "description": "Shared GPU notebook for ML",
+          "installUrl": "https://jupyter.org/install",
+          "docUrl": "https://docs.jupyter.org",
+          "installCmd": "pip install jupyter",
+          "benefit": "Share GPU-powered notebooks with classmates",
+          "guide": "Jupyter Notebook gives you an interactive browser environment for Python, PyTorch, and Data Science. Running Jupyter allows you to share live code notebooks with classmates over the intranet.",
+          "status": "not_found"
+        },
+        {
+          "name": "Ollama (Local LLM)",
+          "port": 11434,
+          "icon": "🤖",
+          "description": "Run AI models locally on GPU or CPU/RAM",
+          "installUrl": "https://ollama.com/download",
+          "docUrl": "https://github.com/ollama/ollama/tree/main/docs",
+          "installCmd": "winget install Ollama.Ollama",
+          "benefit": "Run 100% private neural network models offline on your laptop!",
+          "guide": "Ollama allows your laptop to run open-weight AI models (Google Gemma 2, Llama 3.2, DeepSeek-R1) offline locally on CPU/RAM or GPU. Once installed, running `ollama run gemma2:2b` streams responses to the campus AI studio.",
+          "recommendedModels": [
+            {
+              "name": "Google Gemma 2 (2B)",
+              "cmd": "ollama run gemma2:2b",
+              "url": "https://ollama.com/library/gemma2",
+              "ram": "1.6 GB RAM",
+              "note": "Fast & Lightweight for Intel/AMD CPU or GPU"
+            },
+            {
+              "name": "Meta Llama 3.2 (3B)",
+              "cmd": "ollama run llama3.2:3b",
+              "url": "https://ollama.com/library/llama3.2",
+              "ram": "2.0 GB RAM",
+              "note": "General QA, Math & Multi-Turn Chat"
+            },
+            {
+              "name": "Qwen 2.5 Coder (1.5B)",
+              "cmd": "ollama run qwen2.5-coder:1.5b",
+              "url": "https://ollama.com/library/qwen2.5-coder",
+              "ram": "1.0 GB RAM",
+              "note": "Ultra-Fast Python, C++, Java & Web Code"
+            },
+            {
+              "name": "DeepSeek-R1 Distill (1.5B)",
+              "cmd": "ollama run deepseek-r1:1.5b",
+              "url": "https://ollama.com/library/deepseek-r1",
+              "ram": "1.1 GB RAM",
+              "note": "Deep Reasoning & Logic Chain-of-Thought"
+            }
+          ],
+          "status": "not_found"
+        }
+      ],
+      "scannedAt": "2026-08-07T17:30:12.261Z"
+    }
+  },
+  {
+    "id": "node-1786196652050",
+    "name": "Windows Laptop Node (8 Cores)",
+    "ip": "172.16.108.254",
+    "type": "Windows Laptop Node (8 CPU / 16GB RAM)",
+    "ramGB": 16,
+    "vramGB": 4,
+    "status": "Online",
+    "role": "Contributor Student Node",
+    "hasActiveLlm": false,
+    "latencyMs": 2,
+    "scanResults": {
+      "ip": "172.16.108.254",
+      "pingMs": 0,
+      "reachable": false,
+      "detectedFeatures": [],
+      "missingFeatures": [
+        {
+          "name": "SSH Server",
+          "port": 22,
+          "icon": "🔐",
+          "description": "Secure shell access",
+          "installUrl": "https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse",
+          "docUrl": "https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse",
+          "installCmd": "Add-WindowsCapability -Online -Name OpenSSH.Server",
+          "benefit": "Remote terminal access for automation",
+          "guide": "OpenSSH Server enables secure encrypted terminal access for remote cluster orchestration and automated model deployment.",
+          "status": "not_found"
+        },
+        {
+          "name": "Node.js Server",
+          "port": 3000,
+          "icon": "🟢",
+          "description": "Run campus backup server",
+          "installUrl": "https://nodejs.org",
+          "docUrl": "https://nodejs.org/en/docs",
+          "installCmd": "winget install OpenJS.NodeJS",
+          "benefit": "Become a backup server node for 24/7 campus uptime",
+          "guide": "Node.js powers the campus supercomputer portal server and WebSocket relay. Installing Node.js lets your device act as a redundant backup portal server if the main host goes offline.",
+          "status": "not_found"
+        },
+        {
+          "name": "Python API (Flask)",
+          "port": 5000,
+          "icon": "🐍",
+          "description": "Python REST API server",
+          "installUrl": "https://flask.palletsprojects.com",
+          "docUrl": "https://flask.palletsprojects.com/en/latest/quickstart/",
+          "installCmd": "pip install flask",
+          "benefit": "Serve custom ML models via API",
+          "guide": "Flask is a lightweight Python web framework. It lets you write custom microservices and REST endpoints to serve AI predictions across the campus network.",
+          "status": "not_found"
+        },
+        {
+          "name": "Gradio",
+          "port": 7860,
+          "icon": "🎨",
+          "description": "Build AI web apps instantly",
+          "installUrl": "https://gradio.app",
+          "docUrl": "https://www.gradio.app/docs/",
+          "installCmd": "pip install gradio",
+          "benefit": "Create AI web demos in 5 lines of Python",
+          "guide": "Gradio lets you quickly create user interfaces for machine learning models and Python functions. Classmates on the campus Wi-Fi can open your Gradio web app port (7860) directly in their browsers.",
+          "status": "not_found"
+        },
+        {
+          "name": "Python API (FastAPI)",
+          "port": 8000,
+          "icon": "⚡",
+          "description": "High-performance Python API",
+          "installUrl": "https://fastapi.tiangolo.com",
+          "docUrl": "https://fastapi.tiangolo.com/tutorial/",
+          "installCmd": "pip install fastapi uvicorn",
+          "benefit": "Async Python API for real-time AI",
+          "guide": "FastAPI is an async, high-performance Python framework. Perfect for building ultra-fast AI inference APIs with automatic Swagger documentation.",
+          "status": "not_found"
+        },
+        {
+          "name": "Streamlit",
+          "port": 8501,
+          "icon": "📊",
+          "description": "Data science dashboards",
+          "installUrl": "https://streamlit.io",
+          "docUrl": "https://docs.streamlit.io/",
+          "installCmd": "pip install streamlit",
+          "benefit": "Build interactive ML dashboards",
+          "guide": "Streamlit turns Python data scripts into interactive dashboards. Running Streamlit on port 8501 shares interactive AI visualizations across the intranet.",
+          "status": "not_found"
+        },
+        {
+          "name": "Jupyter Notebook",
+          "port": 8888,
+          "icon": "📓",
+          "description": "Shared GPU notebook for ML",
+          "installUrl": "https://jupyter.org/install",
+          "docUrl": "https://docs.jupyter.org",
+          "installCmd": "pip install jupyter",
+          "benefit": "Share GPU-powered notebooks with classmates",
+          "guide": "Jupyter Notebook gives you an interactive browser environment for Python, PyTorch, and Data Science. Running Jupyter allows you to share live code notebooks with classmates over the intranet.",
+          "status": "not_found"
+        },
+        {
+          "name": "Ollama (Local LLM)",
+          "port": 11434,
+          "icon": "🤖",
+          "description": "Run AI models locally on GPU or CPU/RAM",
+          "installUrl": "https://ollama.com/download",
+          "docUrl": "https://github.com/ollama/ollama/tree/main/docs",
+          "installCmd": "winget install Ollama.Ollama",
+          "benefit": "Run 100% private neural network models offline on your laptop!",
+          "guide": "Ollama allows your laptop to run open-weight AI models (Google Gemma 2, Llama 3.2, DeepSeek-R1) offline locally on CPU/RAM or GPU. Once installed, running `ollama run gemma2:2b` streams responses to the campus AI studio.",
+          "recommendedModels": [
+            {
+              "name": "Google Gemma 2 (2B)",
+              "cmd": "ollama run gemma2:2b",
+              "url": "https://ollama.com/library/gemma2",
+              "ram": "1.6 GB RAM",
+              "note": "Fast & Lightweight for Intel/AMD CPU or GPU"
+            },
+            {
+              "name": "Meta Llama 3.2 (3B)",
+              "cmd": "ollama run llama3.2:3b",
+              "url": "https://ollama.com/library/llama3.2",
+              "ram": "2.0 GB RAM",
+              "note": "General QA, Math & Multi-Turn Chat"
+            },
+            {
+              "name": "Qwen 2.5 Coder (1.5B)",
+              "cmd": "ollama run qwen2.5-coder:1.5b",
+              "url": "https://ollama.com/library/qwen2.5-coder",
+              "ram": "1.0 GB RAM",
+              "note": "Ultra-Fast Python, C++, Java & Web Code"
+            },
+            {
+              "name": "DeepSeek-R1 Distill (1.5B)",
+              "cmd": "ollama run deepseek-r1:1.5b",
+              "url": "https://ollama.com/library/deepseek-r1",
+              "ram": "1.1 GB RAM",
+              "note": "Deep Reasoning & Logic Chain-of-Thought"
+            }
+          ],
+          "status": "not_found"
+        }
+      ],
+      "scannedAt": "2026-08-08T13:56:13.394Z"
     }
   }
 ]
